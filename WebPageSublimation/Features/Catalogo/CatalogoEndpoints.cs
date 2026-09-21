@@ -17,7 +17,7 @@ public static class CatalogoEndpoints
         admin.MapPost("/productos/{id:guid}/estado", async (Guid id, CatalogoService service, [FromForm] bool activo, CancellationToken ct) => Redirect(await service.CambiarEstadoProductoAsync(id, activo, ct)));
         admin.MapPost("/productos/{id:guid}/variantes", async (Guid id, CatalogoService service, [FromForm] string? nombre, CancellationToken ct) => Redirect(await service.CrearVarianteAsync(id, nombre, ct)));
         admin.MapPost("/productos/{productId:guid}/variantes/{variantId:guid}/estado", async (Guid productId, Guid variantId, CatalogoService service, [FromForm] bool activo, CancellationToken ct) => Redirect(await service.CambiarEstadoVarianteAsync(productId, variantId, activo, ct)));
-        admin.MapPost("/productos/{id:guid}/imagenes", async (Guid id, CatalogoService service, [FromForm] List<IFormFile>? imagenes, CancellationToken ct) => Redirect(await service.GuardarImagenesAsync(id, imagenes, ct)));
+        admin.MapPost("/productos/{id:guid}/imagenes", async (Guid id, CatalogoService service, [FromForm] List<IFormFile>? imagenes, CancellationToken ct) => Redirect(await service.GuardarImagenesAsync(id, imagenes?.Select(AsImagenCarga).ToList(), ct)));
         admin.MapPost("/productos/{productId:guid}/imagenes/{imageId:guid}/principal", async (Guid productId, Guid imageId, CatalogoService service, CancellationToken ct) => Redirect(await service.EstablecerImagenPrincipalAsync(productId, imageId, ct)));
         admin.MapPost("/productos/{productId:guid}/imagenes/{imageId:guid}/eliminar", async (Guid productId, Guid imageId, CatalogoService service, CancellationToken ct) => Redirect(await service.EliminarImagenAsync(productId, imageId, ct)));
 
@@ -28,5 +28,7 @@ public static class CatalogoEndpoints
         });
         return endpoints;
     }
+    private static ImagenCarga AsImagenCarga(IFormFile file) => new(file.FileName, file.Length,
+        _ => Task.FromResult<Stream>(file.OpenReadStream()));
     private static IResult Redirect(ResultadoCatalogo result) => Results.LocalRedirect($"/admin/catalogo?mensaje={Uri.EscapeDataString(result.Message)}&tipo={(result.Success ? "ok" : "error")}");
 }

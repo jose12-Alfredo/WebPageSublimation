@@ -144,7 +144,7 @@ public sealed class CatalogoService(IDbContextFactory<AppDbContext> dbFactory)
         return ResultadoCatalogo.Ok(active ? "La variante fue activada." : "La variante fue desactivada.");
     }
 
-    public async Task<ResultadoCatalogo> GuardarImagenesAsync(Guid productId, IReadOnlyList<IFormFile>? images,
+    public async Task<ResultadoCatalogo> GuardarImagenesAsync(Guid productId, IReadOnlyList<ImagenCarga>? images,
         CancellationToken ct = default)
     {
         if (images is null || images.Count == 0) return ResultadoCatalogo.Error("Selecciona al menos una imagen.");
@@ -158,8 +158,9 @@ public sealed class CatalogoService(IDbContextFactory<AppDbContext> dbFactory)
         {
             if (image.Length == 0 || image.Length > 5 * 1024 * 1024)
                 return ResultadoCatalogo.Error("Cada imagen debe pesar entre 1 byte y 5 MB.");
+            await using var source = await image.OpenReadAsync(ct);
             await using var memory = new MemoryStream();
-            await image.CopyToAsync(memory, ct);
+            await source.CopyToAsync(memory, ct);
             var bytes = memory.ToArray();
             var detectedType = DetectImageContentType(bytes);
             if (detectedType is null)
@@ -255,4 +256,5 @@ public sealed record ProductoResumen(Guid Id, string Nombre, string? Descripcion
 public sealed record VarianteResumen(Guid Id, string Nombre, bool IsActive);
 public sealed record ImagenResumen(Guid Id, bool EsPrincipal, int Orden);
 public sealed record ImagenProductoContenido(byte[] Data, string ContentType);
+public sealed record ImagenCarga(string FileName, long Length, Func<CancellationToken, Task<Stream>> OpenReadAsync);
 public sealed record ResultadoCatalogo(bool Success, string Message) { public static ResultadoCatalogo Ok(string m) => new(true,m); public static ResultadoCatalogo Error(string m) => new(false,m); }

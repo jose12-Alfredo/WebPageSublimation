@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using WebPageSublimation.Data;
 using WebPageSublimation.Features.Catalogo;
@@ -35,7 +34,7 @@ public sealed class CatalogoImageTests
     }
 
     [Fact]
-    public async Task Guarda_un_Jpeg_aunque_el_navegador_no_reporte_su_tipo_correctamente()
+    public async Task Guarda_un_Jpeg_a_partir_de_su_contenido_real()
     {
         var options = new DbContextOptionsBuilder<AppDbContext>()
             .UseInMemoryDatabase($"catalogo-{Guid.NewGuid()}").Options;
@@ -51,12 +50,8 @@ public sealed class CatalogoImageTests
         var factory = new TestDbContextFactory(options);
         var service = new CatalogoService(factory);
         var jpeg = new byte[] { 0xFF, 0xD8, 0xFF, 0x00 };
-        await using var stream = new MemoryStream(jpeg);
-        IFormFile image = new FormFile(stream, 0, jpeg.Length, "imagenes", "polera.jpg")
-        {
-            Headers = new HeaderDictionary(),
-            ContentType = "application/octet-stream"
-        };
+        var image = new ImagenCarga("polera.jpg", jpeg.Length,
+            _ => Task.FromResult<Stream>(new MemoryStream(jpeg)));
 
         var result = await service.GuardarImagenesAsync(productId, [image]);
 
