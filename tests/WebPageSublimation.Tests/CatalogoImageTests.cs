@@ -1,3 +1,6 @@
+using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
+using WebPageSublimation.Data;
 using WebPageSublimation.Features.Catalogo;
 using Xunit;
 
@@ -29,5 +32,46 @@ public sealed class CatalogoImageTests
     {
         Assert.Null(CatalogoService.DetectImageContentType("<script>alert(1)</script>"u8));
         Assert.Null(CatalogoService.DetectImageContentType([]));
+    }
+
+    [Fact]
+    public async Task Guarda_un_Jpeg_aunque_el_navegador_no_reporte_su_tipo_correctamente()
+    {
+        var options = new DbContextOptionsBuilder<AppDbContext>()
+            .UseInMemoryDatabase($"catalogo-{Guid.NewGuid()}").Options;
+        var categoryId = Guid.NewGuid();
+        var productId = Guid.NewGuid();
+        await using (var database = new AppDbContext(options))
+        {
+            database.Categorias.Add(new Categoria { Id = categoryId, Nombre = "Ropa" });
+            database.Productos.Add(new Producto { Id = productId, CategoriaId = categoryId, Nombre = "Polera", PrecioComercial = 50 });
+            await database.SaveChangesAsync();
+        }
+
+        var factory = new TestDbContextFactory(options);
+        var service = new CatalogoService(factory);
+        var jpeg = new byte[] { 0xFF, 0xD8, 0xFF, 0x00 };
+        await using var stream = new MemoryStream(jpeg);
+        IFormFile image = new FormFile(stream, 0, jpeg.Length, "imagenes", "polera.jpg")
+        {
+            Headers = new HeaderDictionary(),
+            ContentType = "application/octet-stream"
+        };
+
+        var result = await service.GuardarImagenesAsync(productId, [image]);
+
+        Assert.True(result.Success);
+        await using var verification = new AppDbContext(options);
+        var saved = await verification.ImagenesProducto.SingleAsync();
+        Assert.Equal("image/jpeg", saved.ContentType);
+        Assert.Equal(jpeg, saved.Data);
+    }
+
+    private sealed class TestDbContextFactory(DbContextOptions<AppDbContext> options) : IDbContextFactory<AppDbContext>
+    {
+        public AppDbContext CreateDbContext() => new(options);
+
+        public Task<AppDbContext> CreateDbContextAsync(CancellationToken cancellationToken = default) =>
+            Task.FromResult(CreateDbContext());
     }
 }

@@ -149,7 +149,6 @@ public sealed class CatalogoService(IDbContextFactory<AppDbContext> dbFactory)
     {
         if (images is null || images.Count == 0) return ResultadoCatalogo.Error("Selecciona al menos una imagen.");
         if (images.Count > 8) return ResultadoCatalogo.Error("Puedes subir hasta 8 imágenes por vez.");
-        var allowed = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "image/jpeg", "image/png", "image/webp" };
         await using var db = await dbFactory.CreateDbContextAsync(ct);
         if (!await db.Productos.AnyAsync(x => x.Id == productId, ct)) return ResultadoCatalogo.Error("El producto no está disponible.");
         var currentCount = await db.ImagenesProducto.CountAsync(x => x.ProductoId == productId, ct);
@@ -159,13 +158,12 @@ public sealed class CatalogoService(IDbContextFactory<AppDbContext> dbFactory)
         {
             if (image.Length == 0 || image.Length > 5 * 1024 * 1024)
                 return ResultadoCatalogo.Error("Cada imagen debe pesar entre 1 byte y 5 MB.");
-            if (!allowed.Contains(image.ContentType)) return ResultadoCatalogo.Error("Usa imágenes JPG, PNG o WebP.");
             await using var memory = new MemoryStream();
             await image.CopyToAsync(memory, ct);
             var bytes = memory.ToArray();
             var detectedType = DetectImageContentType(bytes);
-            if (detectedType is null || !string.Equals(detectedType, image.ContentType, StringComparison.OrdinalIgnoreCase))
-                return ResultadoCatalogo.Error($"El archivo {image.FileName} no coincide con su formato declarado.");
+            if (detectedType is null)
+                return ResultadoCatalogo.Error($"El archivo {image.FileName} debe ser una imagen JPG, PNG o WebP válida.");
             prepared.Add((bytes, detectedType));
         }
         var nextOrder = await db.ImagenesProducto.Where(x => x.ProductoId == productId)
