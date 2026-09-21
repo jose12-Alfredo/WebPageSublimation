@@ -94,13 +94,29 @@
     line-height: 1.45;
 }
 
-.demo-access dl {
+.demo-users {
     display: grid;
-    gap: .65rem;
+    gap: .8rem;
+}
+
+.demo-user {
+    padding-top: .8rem;
+    border-top: 1px solid #cfd2ca;
+}
+
+.demo-user h4 {
+    margin: 0 0 .6rem;
+    font-size: .86rem;
+    font-weight: 850;
+}
+
+.demo-user dl {
+    display: grid;
+    gap: .55rem;
     margin: 0;
 }
 
-.demo-access dl div {
+.demo-user dl div {
     display: grid;
     gap: .12rem;
 }
@@ -125,14 +141,6 @@
     background: #d9ff57;
     color: #10120f;
     font: inherit;
-}
-
-.demo-access small {
-    display: block;
-    margin-top: 1rem;
-    color: #4f564b;
-    font-size: .72rem;
-    line-height: 1.4;
 }
 
 .login-form label {

@@ -1,8 +1,8 @@
 namespace WebPageSublimation.Features.Auth;
 
 /// <summary>
-/// Expone únicamente la cuenta de promotor configurada para una demostración pública.
-/// La visualización exige una confirmación explícita y nunca muestra la contraseña administrativa.
+/// Expone las cuentas configuradas para una demostración pública.
+/// La visualización exige que el acceso demo y la publicación de credenciales estén habilitados.
 /// </summary>
 public sealed record DemoLoginCredentials(
     string PromoterEmail,

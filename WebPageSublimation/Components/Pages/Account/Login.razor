@@ -27,32 +27,42 @@
         @if (DemoCredentials is not null)
         {
             <section class="demo-access" aria-labelledby="demo-access-title">
-                <h3 id="demo-access-title">Acceso de demostración</h3>
-                <p>Usa esta cuenta para recorrer el espacio comercial.</p>
-                <dl>
-                    <div>
-                        <dt>Promotor</dt>
-                        <dd>@DemoCredentials.PromoterEmail</dd>
-                    </div>
-                    <div>
-                        <dt>Contraseña</dt>
-                        <dd><code>@DemoCredentials.PromoterPassword</code></dd>
-                    </div>
+                <h3 id="demo-access-title">Usuarios de demostración</h3>
+                <p>Elige un rol y usa sus credenciales para probar el sistema.</p>
+                <div class="demo-users">
                     @if (!string.IsNullOrWhiteSpace(DemoCredentials.AdministratorEmail))
                     {
-                        <div>
-                            <dt>Administrador</dt>
-                            <dd>@DemoCredentials.AdministratorEmail</dd>
-                        </div>
+                        <article class="demo-user">
+                            <h4>Administrador</h4>
+                            <dl>
+                                <div>
+                                    <dt>Usuario</dt>
+                                    <dd>@DemoCredentials.AdministratorEmail</dd>
+                                </div>
+                                @if (!string.IsNullOrWhiteSpace(DemoCredentials.AdministratorPassword))
+                                {
+                                    <div>
+                                        <dt>Contraseña</dt>
+                                        <dd><code>@DemoCredentials.AdministratorPassword</code></dd>
+                                    </div>
+                                }
+                            </dl>
+                        </article>
                     }
-                    @if (!string.IsNullOrWhiteSpace(DemoCredentials.AdministratorPassword))
-                    {
-                        <div>
-                            <dt>Contraseña</dt>
-                            <dd><code>@DemoCredentials.AdministratorPassword</code></dd>
-                        </div>
-                    }
-                </dl>
+                    <article class="demo-user">
+                        <h4>Promotor</h4>
+                        <dl>
+                            <div>
+                                <dt>Usuario</dt>
+                                <dd>@DemoCredentials.PromoterEmail</dd>
+                            </div>
+                            <div>
+                                <dt>Contraseña</dt>
+                                <dd><code>@DemoCredentials.PromoterPassword</code></dd>
+                            </div>
+                        </dl>
+                    </article>
+                </div>
             </section>
         }
 
