@@ -17,16 +17,34 @@
 .impeccable/live/deferred-svelte-component-accepts.json
 .impeccable/live/*.png
 
-# Compilación y configuración local
-**/bin/
-**/obj/
-**/*.user
+# Compilación y publicación de .NET
+[Bb]in/
+[Oo]bj/
+[Dd]ebug/
+[Rr]elease/
+[Pp]ublish/
+packages/
+*.nupkg
+*.snupkg
+
+# Visual Studio, Rider y editores
 .vs/
 .idea/
+.vscode/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.sln.iml
 .agents/
 .codex/
 
-# Pruebas visuales y salidas generadas
+# Pruebas, cobertura y salidas generadas
+TestResults/
+coverage/
+coverage.*
+*.coverage
+*.coveragexml
 artifacts/
 output/
 tmp/
@@ -37,6 +55,12 @@ tmp/
 !.env.example
 appsettings.Production.json
 **/appsettings.Production.json
+appsettings.Local.json
+**/appsettings.Local.json
+appsettings.*.local.json
+**/appsettings.*.local.json
+secrets.json
+local.settings.json
 *.pfx
 *.key
 *.pem
