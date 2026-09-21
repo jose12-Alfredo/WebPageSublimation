@@ -66,6 +66,25 @@ public class DemoUserConfigurationTests
         Assert.Equal("promotor.demo@simons.test", credentials.PromoterEmail);
         Assert.Equal("admin.demo@simons.test", credentials.AdministratorEmail);
         Assert.Equal("Admin!2026", credentials.AdministratorPassword);
+        Assert.True(credentials.HasAdministrator);
+    }
+
+    [Fact]
+    public void La_cuenta_administrador_solo_se_ofrece_con_correo_y_contrasena()
+    {
+        var configuration = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
+        {
+            ["DemoUsers:Enabled"] = "true",
+            ["DemoAccess:ShowCredentials"] = "true",
+            ["DemoUsers:PromoterEmail"] = "promotor.demo@simons.test",
+            ["DemoUsers:PromoterPassword"] = "Demo!2026",
+            ["InitialAdmin:Email"] = "admin.demo@simons.test"
+        }).Build();
+
+        var credentials = DemoLoginCredentials.From(configuration);
+
+        Assert.NotNull(credentials);
+        Assert.False(credentials.HasAdministrator);
     }
 
     private static ServiceProvider CrearProveedor(Dictionary<string, string?> values)

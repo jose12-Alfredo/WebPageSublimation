@@ -28,31 +28,26 @@
         {
             <section class="demo-access" aria-labelledby="demo-access-title">
                 <h3 id="demo-access-title">Acceso de demostración</h3>
-                <p>Usa esta cuenta para recorrer el espacio comercial.</p>
-                <dl>
-                    <div>
-                        <dt>Promotor</dt>
-                        <dd>@DemoCredentials.PromoterEmail</dd>
-                    </div>
-                    <div>
-                        <dt>Contraseña</dt>
-                        <dd><code>@DemoCredentials.PromoterPassword</code></dd>
-                    </div>
-                    @if (!string.IsNullOrWhiteSpace(DemoCredentials.AdministratorEmail))
+                <p>Selecciona una cuenta para completar el acceso.</p>
+                <div class="demo-accounts">
+                    @if (DemoCredentials.HasAdministrator)
                     {
-                        <div>
-                            <dt>Administrador</dt>
-                            <dd>@DemoCredentials.AdministratorEmail</dd>
-                        </div>
+                        <button type="button" class="demo-account" aria-pressed="false"
+                                data-demo-email="@DemoCredentials.AdministratorEmail"
+                                data-demo-password="@DemoCredentials.AdministratorPassword">
+                            <span class="demo-role">Administrador</span>
+                            <span class="demo-email">@DemoCredentials.AdministratorEmail</span>
+                            <code>@DemoCredentials.AdministratorPassword</code>
+                        </button>
                     }
-                    @if (!string.IsNullOrWhiteSpace(DemoCredentials.AdministratorPassword))
-                    {
-                        <div>
-                            <dt>Contraseña</dt>
-                            <dd><code>@DemoCredentials.AdministratorPassword</code></dd>
-                        </div>
-                    }
-                </dl>
+                    <button type="button" class="demo-account" aria-pressed="false"
+                            data-demo-email="@DemoCredentials.PromoterEmail"
+                            data-demo-password="@DemoCredentials.PromoterPassword">
+                        <span class="demo-role">Promotor</span>
+                        <span class="demo-email">@DemoCredentials.PromoterEmail</span>
+                        <code>@DemoCredentials.PromoterPassword</code>
+                    </button>
+                </div>
             </section>
         }
 

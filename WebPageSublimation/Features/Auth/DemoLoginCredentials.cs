@@ -1,8 +1,8 @@
 namespace WebPageSublimation.Features.Auth;
 
 /// <summary>
-/// Expone únicamente la cuenta de promotor configurada para una demostración pública.
-/// La visualización exige una confirmación explícita y nunca muestra la contraseña administrativa.
+/// Expone las cuentas de promotor y administrador configuradas para una demostración.
+/// La visualización exige habilitar DemoUsers:Enabled y DemoAccess:ShowCredentials.
 /// </summary>
 public sealed record DemoLoginCredentials(
     string PromoterEmail,
@@ -10,6 +10,9 @@ public sealed record DemoLoginCredentials(
     string? AdministratorEmail,
     string? AdministratorPassword)
 {
+    public bool HasAdministrator =>
+        !string.IsNullOrWhiteSpace(AdministratorEmail) && !string.IsNullOrWhiteSpace(AdministratorPassword);
+
     public static DemoLoginCredentials? From(IConfiguration configuration)
     {
         if (!configuration.GetValue<bool>("DemoUsers:Enabled") ||
