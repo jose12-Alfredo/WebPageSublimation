@@ -10,6 +10,17 @@ Configurar en el panel del proveedor, sin incluir sus valores en Git:
 - `InitialAdmin__Email`: correo del administrador inicial.
 - `InitialAdmin__Password`: contraseña fuerte de al menos 12 caracteres, con mayúscula, minúscula, número y símbolo.
 
+## Datos de demostración para una base nueva
+
+Para una demostración sobre una base PostgreSQL vacía, el arranque aplica primero las migraciones y luego puede cargar datos de ejemplo de forma idempotente. Configure estas variables solo en el entorno demo:
+
+- `DemoUsers__Enabled=true`
+- `DemoData__Enabled=true`
+- `DemoUsers__PromoterEmail`, `DemoUsers__PromoterPassword` y `DemoUsers__PromoterName`
+- `DemoUsers__ClientEmail` y `DemoUsers__ClientName`
+
+La carga incluye las cuatro referencias de catálogo y sus seis fotografías aprobadas que ya están en el repositorio, un promotor, un cliente, una proforma y dos pedidos sintéticos. No copia usuarios, contraseñas, contactos, pedidos ni proformas reales de otra base. En producción mantenga ambas opciones en `false`.
+
 La configuración de Render deshabilita la creación automática de usuarios demo. Las cuentas que ya existan en Neon permanecen en la base, por lo que sus contraseñas deben rotarse antes de hacer pública la dirección.
 
 ## Publicación con Render

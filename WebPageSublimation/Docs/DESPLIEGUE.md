@@ -15,6 +15,22 @@ terminar HTTPS y reenviar `X-Forwarded-For` y `X-Forwarded-Proto`.
 Las cuentas demo deben apagarse con `DemoUsers__Enabled=false`. Las contraseñas y la cadena de
 conexión nunca se guardan en `appsettings.json` ni en el repositorio.
 
+## Base de demostración vacía
+
+Una base nueva recibe automáticamente las migraciones al arrancar. Para cargar también la demostración, configure en el proveedor:
+
+| Variable | Valor para demo |
+|---|---|
+| `DemoUsers__Enabled` | `true` |
+| `DemoData__Enabled` | `true` |
+| `DemoUsers__PromoterEmail` | correo ficticio del promotor demo |
+| `DemoUsers__PromoterPassword` | contraseña fuerte del promotor demo |
+| `DemoUsers__PromoterName` | nombre visible del promotor demo |
+| `DemoUsers__ClientEmail` | correo ficticio del cliente demo |
+| `DemoUsers__ClientName` | nombre visible del cliente demo |
+
+La carga es idempotente: reiniciar el servicio no duplica el catálogo, las imágenes ni las operaciones de ejemplo. Usa las seis fotografías reales ya aprobadas dentro del repositorio y datos comerciales sintéticos; no replica cuentas, contraseñas, contactos ni documentos reales de otra base.
+
 ## Datos comerciales configurables
 
 Configurar cuando Simons entregue los datos definitivos:

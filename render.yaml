@@ -18,6 +18,8 @@ services:
         value: /keys
       - key: DemoUsers__Enabled
         value: "false"
+      - key: DemoData__Enabled
+        value: "false"
       - key: ConnectionStrings__DefaultConnection
         sync: false
       - key: InitialAdmin__Email

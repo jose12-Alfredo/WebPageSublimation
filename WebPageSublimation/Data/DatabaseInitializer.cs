@@ -74,6 +74,8 @@ public static class DatabaseInitializer
 
         if (!app.Configuration.GetValue<bool>("DemoUsers:Enabled")) return;
 
+        var demoDataEnabled = app.Configuration.GetValue<bool>("DemoData:Enabled");
+
         var promoterEmail = app.Configuration["DemoUsers:PromoterEmail"]?.Trim().ToLowerInvariant();
         var previousPromoterEmail = app.Configuration["DemoUsers:PreviousPromoterEmail"]?
             .Trim().ToLowerInvariant();
@@ -144,6 +146,16 @@ public static class DatabaseInitializer
                 PromotorId = promoterProfile.Id
             });
             await db.SaveChangesAsync();
+        }
+
+        if (demoDataEnabled)
+        {
+            await DemoDataSeeder.SeedAsync(
+                db,
+                promoterProfile,
+                client,
+                app.Environment.ContentRootPath);
+            logger.LogInformation("Se cargaron los datos de demostración.");
         }
     }
 
