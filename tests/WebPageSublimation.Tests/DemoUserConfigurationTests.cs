@@ -41,33 +41,38 @@ public class DemoUserConfigurationTests
     }
 
     [Fact]
-    public void Las_credenciales_demo_siempre_estan_disponibles_en_el_login()
+    public void Las_credenciales_visibles_exigen_habilitacion_explicita()
     {
         var hidden = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
         {
-            ["DemoUsers:Enabled"] = "true",
-            ["DemoUsers:PromoterEmail"] = "promotor.demo@simons.test",
-            ["DemoUsers:PromoterPassword"] = "Demo!2026"
+            ["DemoUsers:Enabled"] = "true"
         }).Build();
-        var defaults = DemoLoginCredentials.From(hidden);
-        Assert.NotNull(defaults);
-        Assert.Equal(DemoUserDefaults.PromoterEmail, defaults.PromoterEmail);
+        Assert.Null(DemoLoginCredentials.From(hidden));
 
         var visible = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
         {
-            ["DemoUsers:Enabled"] = "true",
-            ["DemoAccess:ShowCredentials"] = "true",
-            ["DemoUsers:PromoterEmail"] = "promotor.demo@simons.test",
-            ["DemoUsers:PromoterPassword"] = "Demo!2026",
-            ["InitialAdmin:Email"] = "admin.demo@simons.test",
-            ["InitialAdmin:Password"] = "Admin!2026"
+            ["DemoAccess:ShowCredentials"] = "true"
         }).Build();
-        var credentials = DemoLoginCredentials.From(visible);
+        Assert.NotNull(DemoLoginCredentials.From(visible));
+    }
+
+    [Fact]
+    public void El_login_muestra_las_cuentas_sembradas_y_nunca_el_administrador_inicial()
+    {
+        var configuration = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
+        {
+            ["DemoAccess:ShowCredentials"] = "true",
+            ["InitialAdmin:Email"] = "admin.real@simons.test",
+            ["InitialAdmin:Password"] = "Secreta!Real2026"
+        }).Build();
+
+        var credentials = DemoLoginCredentials.From(configuration);
 
         Assert.NotNull(credentials);
-        Assert.Equal(DemoUserDefaults.PromoterEmail, credentials.PromoterEmail);
         Assert.Equal(DemoUserDefaults.AdministratorEmail, credentials.AdministratorEmail);
         Assert.Equal(DemoUserDefaults.AdministratorPassword, credentials.AdministratorPassword);
+        Assert.Equal(DemoUserDefaults.PromoterEmail, credentials.PromoterEmail);
+        Assert.Equal(DemoUserDefaults.PromoterPassword, credentials.PromoterPassword);
     }
 
     private static ServiceProvider CrearProveedor(Dictionary<string, string?> values)
