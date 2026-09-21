@@ -31,7 +31,7 @@
         </div>
     </header>
     <main id="contenido-principal">@Body</main>
-    <footer class="public-footer"><div class="footer-brand"><img src="/images/simons-logo-horizontal.png" alt="Simons Tu Publicidad" /><span>Publicidad · Sublimación · Imprenta</span></div><div class="footer-actions"><a href="/solicitar-cotizacion">Cuéntanos qué necesitas <span>→</span></a>@if(!string.IsNullOrWhiteSpace(WhatsAppUrl)){<a href="@WhatsAppUrl" target="_blank" rel="noopener noreferrer">WhatsApp <span>↗</span></a>}</div></footer>
+    <footer class="public-footer"><div class="footer-brand"><img src="/images/simons-logo-horizontal.png" alt="Simons Tu Publicidad" /><span>Publicidad · Sublimación · Imprenta</span><small class="footer-credit">Desarrollado por JsonCorp</small></div><div class="footer-actions"><a href="/solicitar-cotizacion">Cuéntanos qué necesitas <span>→</span></a>@if(!string.IsNullOrWhiteSpace(WhatsAppUrl)){<a href="@WhatsAppUrl" target="_blank" rel="noopener noreferrer">WhatsApp <span>↗</span></a>}</div></footer>
 </div>
 <div id="blazor-error-ui" data-nosnippet>Ocurrió un error inesperado. <a href="." class="reload">Recargar</a></div>
 @code { private string? WhatsAppUrl { get { var raw=Configuration["PublicContact:WhatsApp"]; if(string.IsNullOrWhiteSpace(raw)) return null; var digits=new string(raw.Where(char.IsDigit).ToArray()); return digits.Length<8?null:$"https://wa.me/{digits}"; } } }

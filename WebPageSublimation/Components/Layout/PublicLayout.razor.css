@@ -141,6 +141,7 @@
 
 .public-footer div { display: grid; gap: .35rem; }
 .public-footer div span { color: #b5bbaf; font-size: .8rem; }
+.footer-credit { margin-top: .45rem; color: #dce1d6; font-size: .78rem; font-weight: 700; }
 
 .public-footer a {
     min-height: 44px;
