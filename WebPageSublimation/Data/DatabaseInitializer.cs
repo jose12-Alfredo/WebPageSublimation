@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using WebPageSublimation.Security;
 using WebPageSublimation.Features.Promotores;
 using WebPageSublimation.Features.Clientes;
+using WebPageSublimation.Features.Auth;
 
 namespace WebPageSublimation.Data;
 
@@ -72,18 +73,19 @@ public static class DatabaseInitializer
             }
         }
 
-        if (!app.Configuration.GetValue<bool>("DemoUsers:Enabled")) return;
-
         var demoDataEnabled = app.Configuration.GetValue<bool>("DemoData:Enabled");
 
-        var promoterEmail = app.Configuration["DemoUsers:PromoterEmail"]?.Trim().ToLowerInvariant();
+        await EnsureDemoUserAsync(
+            userManager,
+            DemoUserDefaults.AdministratorEmail,
+            DemoUserDefaults.AdministratorPassword,
+            Roles.Administrador);
+
+        var promoterEmail = DemoUserDefaults.PromoterEmail;
         var previousPromoterEmail = app.Configuration["DemoUsers:PreviousPromoterEmail"]?
             .Trim().ToLowerInvariant();
-        var promoterPassword = app.Configuration["DemoUsers:PromoterPassword"];
-        var promoterName = app.Configuration["DemoUsers:PromoterName"]?.Trim();
-        if (string.IsNullOrWhiteSpace(promoterEmail) || string.IsNullOrWhiteSpace(promoterPassword) ||
-            string.IsNullOrWhiteSpace(promoterName))
-            throw new InvalidOperationException("DemoUsers está habilitado pero faltan datos del promotor demo.");
+        var promoterPassword = DemoUserDefaults.PromoterPassword;
+        var promoterName = DemoUserDefaults.PromoterName;
 
         var promoterUser = await userManager.FindByEmailAsync(promoterEmail);
         if (promoterUser is null && !string.IsNullOrWhiteSpace(previousPromoterEmail))
@@ -123,10 +125,8 @@ public static class DatabaseInitializer
             await db.SaveChangesAsync();
         }
 
-        var clientEmail = app.Configuration["DemoUsers:ClientEmail"]?.Trim().ToLowerInvariant();
-        var clientName = app.Configuration["DemoUsers:ClientName"]?.Trim();
-        if (string.IsNullOrWhiteSpace(clientEmail) || string.IsNullOrWhiteSpace(clientName))
-            throw new InvalidOperationException("DemoUsers está habilitado pero faltan datos del cliente demo.");
+        var clientEmail = DemoUserDefaults.ClientEmail;
+        var clientName = DemoUserDefaults.ClientName;
 
         var promoterProfile = await db.Promotores.SingleAsync(x => x.UserId == promoterUser.Id);
         var client = await db.Clientes.SingleOrDefaultAsync(x => x.Email == clientEmail);
@@ -157,6 +157,31 @@ public static class DatabaseInitializer
                 app.Environment.ContentRootPath);
             logger.LogInformation("Se cargaron los datos de demostración.");
         }
+    }
+
+    private static async Task<ApplicationUser> EnsureDemoUserAsync(
+        UserManager<ApplicationUser> userManager,
+        string email,
+        string password,
+        string role)
+    {
+        var user = await userManager.FindByEmailAsync(email);
+        if (user is null)
+        {
+            user = new ApplicationUser
+            {
+                UserName = email,
+                Email = email,
+                EmailConfirmed = true,
+                IsActive = true
+            };
+            EnsureSucceeded(await userManager.CreateAsync(user, password), $"crear el usuario demo {role}");
+        }
+
+        if (!await userManager.IsInRoleAsync(user, role))
+            EnsureSucceeded(await userManager.AddToRoleAsync(user, role), $"asignar el rol {role} al usuario demo");
+
+        return user;
     }
 
     private static void EnsureSucceeded(IdentityResult result, string operation)

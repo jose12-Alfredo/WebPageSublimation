@@ -16,13 +16,13 @@ Para una demostración sobre una base PostgreSQL vacía, el arranque aplica prim
 
 - `DemoUsers__Enabled=true`
 - `DemoData__Enabled=true`
-- `DemoAccess__ShowCredentials=true` para mostrar en el login las cuentas demo y facilitar la presentación.
+- `DemoAccess__ShowCredentials=true` para mostrar en el login las cuentas demo y facilitar la presentación. La configuración de Render ya habilita esta opción en producción.
 - `DemoUsers__PromoterEmail`, `DemoUsers__PromoterPassword` y `DemoUsers__PromoterName`
 - `DemoUsers__ClientEmail` y `DemoUsers__ClientName`
 
-La carga incluye las cuatro referencias de catálogo y sus seis fotografías aprobadas que ya están en el repositorio, un promotor, un cliente, una proforma y dos pedidos sintéticos. No copia usuarios, contraseñas, contactos, pedidos ni proformas reales de otra base. Con `DemoAccess__ShowCredentials=true`, la pantalla de acceso muestra las contraseñas de las cuentas demo configuradas. En producción mantenga las tres opciones en `false`.
+La carga incluye las cuatro referencias de catálogo y sus seis fotografías aprobadas que ya están en el repositorio, un promotor, un cliente, una proforma y dos pedidos sintéticos. No copia usuarios, contraseñas, contactos, pedidos ni proformas reales de otra base. Con `DemoAccess__ShowCredentials=true`, la pantalla de acceso muestra las credenciales configuradas y el rol de cada cuenta. Esta demostración las mantiene visibles en producción para que el cliente pueda probar el sistema desde la pantalla de acceso.
 
-La configuración de Render deshabilita la creación automática de usuarios demo. Las cuentas que ya existan en Neon permanecen en la base, por lo que sus contraseñas deben rotarse antes de hacer pública la dirección.
+La configuración de Render habilita la creación automática de usuarios demo. Los correos y contraseñas se configuran como variables privadas del servicio y se muestran intencionalmente en el login de esta demostración.
 
 ## Publicación con Render
 
@@ -51,5 +51,5 @@ Después de validar la dirección temporal:
 - Contraseñas administrativas y de promotores rotadas.
 - Productos y precios comerciales confirmados.
 - Copia de seguridad disponible en Neon.
-- `DemoUsers__Enabled=false`.
+- `DemoUsers__Enabled=true` y `DemoAccess__ShowCredentials=true` mientras la instancia funcione como demostración.
 - Ningún secreto presente en el repositorio.
