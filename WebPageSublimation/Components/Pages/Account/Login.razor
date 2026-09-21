@@ -45,8 +45,14 @@
                             <dd>@DemoCredentials.AdministratorEmail</dd>
                         </div>
                     }
+                    @if (!string.IsNullOrWhiteSpace(DemoCredentials.AdministratorPassword))
+                    {
+                        <div>
+                            <dt>Contraseña</dt>
+                            <dd><code>@DemoCredentials.AdministratorPassword</code></dd>
+                        </div>
+                    }
                 </dl>
-                <small>La contraseña de administrador no se muestra.</small>
             </section>
         }
 

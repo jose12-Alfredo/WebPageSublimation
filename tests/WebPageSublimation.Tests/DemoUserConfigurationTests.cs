@@ -57,13 +57,15 @@ public class DemoUserConfigurationTests
             ["DemoAccess:ShowCredentials"] = "true",
             ["DemoUsers:PromoterEmail"] = "promotor.demo@simons.test",
             ["DemoUsers:PromoterPassword"] = "Demo!2026",
-            ["InitialAdmin:Email"] = "admin.demo@simons.test"
+            ["InitialAdmin:Email"] = "admin.demo@simons.test",
+            ["InitialAdmin:Password"] = "Admin!2026"
         }).Build();
         var credentials = DemoLoginCredentials.From(visible);
 
         Assert.NotNull(credentials);
         Assert.Equal("promotor.demo@simons.test", credentials.PromoterEmail);
         Assert.Equal("admin.demo@simons.test", credentials.AdministratorEmail);
+        Assert.Equal("Admin!2026", credentials.AdministratorPassword);
     }
 
     private static ServiceProvider CrearProveedor(Dictionary<string, string?> values)

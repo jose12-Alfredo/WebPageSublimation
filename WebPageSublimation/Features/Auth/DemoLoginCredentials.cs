@@ -7,7 +7,8 @@ namespace WebPageSublimation.Features.Auth;
 public sealed record DemoLoginCredentials(
     string PromoterEmail,
     string PromoterPassword,
-    string? AdministratorEmail)
+    string? AdministratorEmail,
+    string? AdministratorPassword)
 {
     public static DemoLoginCredentials? From(IConfiguration configuration)
     {
@@ -27,6 +28,7 @@ public sealed record DemoLoginCredentials(
         return new DemoLoginCredentials(
             promoterEmail,
             promoterPassword,
-            configuration["InitialAdmin:Email"]?.Trim());
+            configuration["InitialAdmin:Email"]?.Trim(),
+            configuration["InitialAdmin:Password"]);
     }
 }

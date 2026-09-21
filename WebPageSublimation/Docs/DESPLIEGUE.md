@@ -23,14 +23,14 @@ Una base nueva recibe automáticamente las migraciones al arrancar. Para cargar 
 |---|---|
 | `DemoUsers__Enabled` | `true` |
 | `DemoData__Enabled` | `true` |
-| `DemoAccess__ShowCredentials` | `true` para mostrar la cuenta del promotor demo en el login |
+| `DemoAccess__ShowCredentials` | `true` para mostrar las cuentas demo configuradas en el login |
 | `DemoUsers__PromoterEmail` | correo ficticio del promotor demo |
 | `DemoUsers__PromoterPassword` | contraseña fuerte del promotor demo |
 | `DemoUsers__PromoterName` | nombre visible del promotor demo |
 | `DemoUsers__ClientEmail` | correo ficticio del cliente demo |
 | `DemoUsers__ClientName` | nombre visible del cliente demo |
 
-La carga es idempotente: reiniciar el servicio no duplica el catálogo, las imágenes ni las operaciones de ejemplo. Usa las seis fotografías reales ya aprobadas dentro del repositorio y datos comerciales sintéticos; no replica cuentas, contraseñas, contactos ni documentos reales de otra base. Cuando se habilita la visualización de credenciales, el login muestra solo la cuenta y contraseña del promotor demo; la contraseña administrativa permanece oculta.
+La carga es idempotente: reiniciar el servicio no duplica el catálogo, las imágenes ni las operaciones de ejemplo. Usa las seis fotografías reales ya aprobadas dentro del repositorio y datos comerciales sintéticos; no replica cuentas, contraseñas, contactos ni documentos reales de otra base. Cuando se habilita la visualización de credenciales, el login muestra las cuentas y contraseñas demo configuradas.
 
 ## Datos comerciales configurables
 
