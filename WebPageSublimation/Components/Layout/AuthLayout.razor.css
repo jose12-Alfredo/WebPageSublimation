@@ -38,3 +38,14 @@
     font-size: .55rem;
     letter-spacing: .22em;
 }
+
+.auth-credit {
+    position: absolute;
+    right: 1rem;
+    bottom: max(1rem, env(safe-area-inset-bottom));
+    left: 1rem;
+    color: #5d6259;
+    font-size: .78rem;
+    font-weight: 700;
+    text-align: center;
+}
