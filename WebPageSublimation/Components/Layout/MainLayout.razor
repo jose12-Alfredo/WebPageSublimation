@@ -1,0 +1,21 @@
+@inherits LayoutComponentBase
+
+<div class="page">
+    <aside class="sidebar"><NavMenu /></aside>
+    <div class="workspace">
+        <header class="top-row">
+            <span class="top-label">SIMONS / GESTIÓN COMERCIAL</span>
+            <AuthorizeView>
+                <Authorized Context="session"><span class="user-name">@session.User.Identity?.Name</span></Authorized>
+                <NotAuthorized><a class="login-link" href="/cuenta/ingresar">Ingresar</a></NotAuthorized>
+            </AuthorizeView>
+        </header>
+        <main class="content">@Body</main>
+    </div>
+</div>
+
+<div id="blazor-error-ui" data-nosnippet>
+    Ocurrió un error inesperado.
+    <a href="." class="reload">Recargar</a>
+    <span class="dismiss">×</span>
+</div>

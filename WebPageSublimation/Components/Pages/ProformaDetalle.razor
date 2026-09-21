@@ -1,0 +1,38 @@
+﻿@page "/proformas/{Id:guid}"
+@attribute [Authorize(Roles = Roles.Administrador + "," + Roles.Promotor)]
+@inject ProformaService ServicioProformas
+
+<PageTitle>Detalle de proforma | Simons Publicidad</PageTitle>
+@if (Detalle is null)
+{
+    <section class="empty-state"><strong>No disponible</strong><h2>No encontramos esta proforma.</h2><p>El documento no existe o no pertenece a tu cuenta.</p></section>
+}
+else
+{
+    <div class="document-actions"><button onclick="window.print()">Imprimir / guardar PDF</button></div>
+    <DocumentCompanyHeader />
+    <header class="quote-heading"><div><span>Proforma</span><h1>#@Detalle.Numero</h1></div><div><b>@Detalle.FechaUtc.ToString("dd/MM/yyyy")</b><small>@Detalle.FechaUtc.ToString("HH:mm 'UTC'")</small></div></header>
+    @if (!string.IsNullOrWhiteSpace(Mensaje)) { <p class="feedback @Tipo" role="status">@Mensaje</p> }
+    <section class="quote-parties"><div><span>Cliente</span><strong>@Detalle.ClienteNombre</strong></div><div><span>Promotor</span><strong>@Detalle.PromotorNombre</strong></div></section>
+    <section class="quote-lines">
+        <div class="quote-line quote-labels"><span>Producto</span><span>Cantidad</span><span>Precio</span><span>Subtotal</span></div>
+        @foreach (var linea in Detalle.Lineas)
+        {
+            <div class="quote-line"><strong>@linea.ProductoNombre@if (!string.IsNullOrWhiteSpace(linea.VarianteNombre)) { <small>@linea.VarianteNombre</small> }</strong><span data-label="Cantidad">@linea.Cantidad.ToString("0.###")</span><span data-label="Precio">@linea.PrecioUnitario.ToString("C", Moneda)</span><b data-label="Subtotal">@linea.Subtotal.ToString("C", Moneda)</b></div>
+        }
+        <div class="quote-total"><span>Total</span><strong>@Detalle.Total.ToString("C", Moneda)</strong></div>
+    </section>
+    @if (!string.IsNullOrWhiteSpace(Detalle.Observaciones)) { <section class="quote-notes"><span>Observaciones</span><p>@Detalle.Observaciones</p></section> }
+    <AuthorizeView Roles="@Roles.Promotor"><Authorized><form class="convert-form" method="post" action="/proformas/@Detalle.Id/convertir"><AntiforgeryToken/><label>Fecha requerida (opcional)<input type="date" name="fechaRequerida" /></label><button class="primary-action">Convertir en pedido →</button></form></Authorized></AuthorizeView>
+}
+@code {
+    private static readonly System.Globalization.CultureInfo Moneda = new("es-BO");
+    [Parameter] public Guid Id { get; set; }
+    [SupplyParameterFromQuery(Name = "mensaje")] public string? Mensaje { get; set; }
+    [SupplyParameterFromQuery(Name = "tipo")] public string? Tipo { get; set; }
+    [CascadingParameter] private Task<AuthenticationState> AuthenticationStateTask { get; set; } = default!;
+    private WebPageSublimation.Features.Proformas.ProformaDetalle? Detalle { get; set; }
+    protected override async Task OnParametersSetAsync() { var state = await AuthenticationStateTask; Detalle = await ServicioProformas.ObtenerAsync(state.User, Id); }
+}
+
+

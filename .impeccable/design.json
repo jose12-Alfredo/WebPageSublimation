@@ -1,0 +1,86 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-19T00:00:00-04:00",
+  "title": "Design System: Simons Publicidad",
+  "extensions": {
+    "colorMeta": {
+      "primary-lime": { "role": "primary", "displayName": "Lima Simons", "canonical": "#b6ff27", "tonalRamp": ["#172600", "#294300", "#426b00", "#649900", "#8fd300", "#b6ff27", "#d9ff8f", "#f3ffdc"] },
+      "ink": { "role": "neutral", "displayName": "Tinta", "canonical": "#10120f", "tonalRamp": ["#10120f", "#252924", "#414640", "#62675f", "#888f85", "#b4bbb0", "#dce1d8", "#f6f7f2"] },
+      "paper": { "role": "neutral", "displayName": "Papel de taller", "canonical": "#f4f5f1", "tonalRamp": ["#20221f", "#383b36", "#565a53", "#777c73", "#9fa59a", "#c8cdc3", "#e5e8e1", "#f4f5f1"] }
+      ,"hero-ink": { "role": "neutral", "displayName": "Tinta del hero", "canonical": "#050807", "tonalRamp": ["#050807", "#071009", "#10120f"] }
+      ,"hero-lime": { "role": "primary", "displayName": "Lima luminoso", "canonical": "#b8ff1a", "tonalRamp": ["#8bcf00", "#b8ff1a", "#d9ff57"] }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Titulares públicos de máximo impacto." },
+      "headline": { "displayName": "Headline", "purpose": "Encabezados de página y llamadas comerciales." },
+      "body": { "displayName": "Body", "purpose": "Lectura y operación cotidiana." },
+      "label": { "displayName": "Label", "purpose": "Categorías, estados y metadatos breves." }
+    },
+    "shadows": [
+      { "name": "ambient-card", "value": "0 14px 38px rgba(20, 24, 17, .06)", "purpose": "Separar módulos operativos importantes del fondo." },
+      { "name": "ambient-auth", "value": "0 28px 70px rgba(15, 18, 13, .18)", "purpose": "Dar presencia al panel de autenticación." }
+    ],
+    "motion": [
+      { "name": "state-fast", "value": "160ms ease-out", "purpose": "Cambios de color, borde y foco en controles." },
+      { "name": "reveal", "value": "800ms cubic-bezier(.22,1,.36,1)", "purpose": "Revelar contenido público al entrar en el viewport." },
+      { "name": "hero-arrive", "value": "900ms cubic-bezier(.22,1,.36,1)", "purpose": "Presentar la composición fotográfica principal." }
+    ],
+    "breakpoints": [
+      { "name": "compact", "value": "520px" },
+      { "name": "navigation", "value": "760px" },
+      { "name": "wide-form", "value": "850px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Acción principal firme sobre superficies claras.",
+      "html": "<button class=\"ds-btn-primary\">SOLICITAR COTIZACIÓN <span aria-hidden=\"true\">→</span></button>",
+      "css": ".ds-btn-primary{min-height:52px;padding:.9rem 1.1rem;display:flex;align-items:center;justify-content:space-between;gap:1.5rem;border:0;background:#10120f;color:#fff;font:850 .9rem Inter,Segoe UI,Arial,sans-serif}.ds-btn-primary span{color:#b6ff27;font-size:1.25rem}.ds-btn-primary:hover{background:#242820}.ds-btn-primary:focus-visible{outline:3px solid #649100;outline-offset:3px}"
+    },
+    {
+      "name": "Accent Button",
+      "kind": "button",
+      "refersTo": "button-accent",
+      "description": "Acción de marca sobre fondos oscuros.",
+      "html": "<button class=\"ds-btn-accent\">VER PRODUCTOS</button>",
+      "css": ".ds-btn-accent{min-height:52px;padding:.9rem 1.1rem;border:0;background:#b6ff27;color:#10120f;font:850 .9rem Inter,Segoe UI,Arial,sans-serif}.ds-btn-accent:hover{background:#d9ff57}.ds-btn-accent:focus-visible{outline:3px solid #fff;outline-offset:3px}"
+    },
+    {
+      "name": "Search Field",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Campo de búsqueda del catálogo público.",
+      "html": "<label class=\"ds-field\">BUSCAR<input placeholder=\"Nombre o descripción\"></label>",
+      "css": ".ds-field{display:grid;gap:.35rem;color:#10120f;font:850 .72rem Inter,Segoe UI,Arial,sans-serif;letter-spacing:.08em}.ds-field input{min-height:52px;padding:.8rem;border:1px solid #cbd0c5;border-radius:0;background:#fff;color:#10120f;font:400 1rem Inter,Segoe UI,Arial,sans-serif}.ds-field input:focus-visible{outline:3px solid #649100;outline-offset:2px}"
+    },
+    {
+      "name": "Product Card",
+      "kind": "card",
+      "description": "Fotografía real y datos comerciales confirmados.",
+      "html": "<article class=\"ds-product\"><div class=\"ds-product-photo\">FOTOGRAFÍA 4:3</div><span>CATEGORÍA</span><h3>Producto confirmado</h3><p>Descripción breve administrada por Simons.</p><strong>Precio confirmado</strong><a href=\"#\">Consultar producto →</a></article>",
+      "css": ".ds-product{max-width:320px;padding:1.25rem;display:flex;flex-direction:column;background:#fff;color:#10120f;font-family:Inter,Segoe UI,Arial,sans-serif}.ds-product-photo{aspect-ratio:4/3;margin:-1.25rem -1.25rem 1rem;display:grid;place-items:center;background:#10120f;color:#b6ff27;font-size:.72rem;font-weight:850;letter-spacing:.1em}.ds-product>span{color:#466b00;font-size:.7rem;font-weight:850;letter-spacing:.1em}.ds-product h3{margin:.65rem 0;font-size:1.6rem;letter-spacing:-.03em}.ds-product p{color:#62675e;line-height:1.55}.ds-product strong{margin-top:auto;padding-top:1rem}.ds-product a{margin-top:.8rem;color:#10120f;font-weight:850;text-underline-offset:.25rem}.ds-product a:focus-visible{outline:3px solid #649100;outline-offset:3px}"
+    },
+    {
+      "name": "Internal Navigation",
+      "kind": "nav",
+      "description": "Navegación sobria para administración y promotores.",
+      "html": "<nav class=\"ds-nav\"><a class=\"active\" href=\"#\">Catálogo</a><a href=\"#\">Clientes</a><a href=\"#\">Pedidos</a></nav>",
+      "css": ".ds-nav{width:240px;padding:1rem;display:grid;gap:.3rem;background:#10120f;font-family:Inter,Segoe UI,Arial,sans-serif}.ds-nav a{min-height:46px;padding:.8rem .85rem;border-left:3px solid transparent;color:#c5c9c0;text-decoration:none;font-size:.88rem;font-weight:650}.ds-nav a:hover{background:#1b1e19;color:#fff}.ds-nav a.active{border-left-color:#b6ff27;background:#22261f;color:#fff}.ds-nav a:focus-visible{outline:3px solid #b6ff27;outline-offset:2px}"
+    }
+  ],
+  "narrative": {
+    "northStar": "El taller gráfico de alto contraste",
+    "overview": "La interfaz se comporta como una extensión digital del taller de Simons: directa, expresiva y enfocada en el resultado producido. Los titulares grandes y el contraste entre tinta negra, papel claro y verde lima crean reconocimiento inmediato. La fotografía real es la prueba principal del oficio y el diseño actúa como marco.",
+    "keyCharacteristics": ["Alto contraste con verde lima como acento.", "Titulares pesados y operación clara.", "Fotografías reales con recortes consistentes.", "Superficies planas con profundidad funcional.", "Acciones de cotización fáciles de encontrar."],
+    "rules": [
+      { "name": "Accent Discipline", "body": "El verde lima enfatiza identidad y acción; no se usa como color de texto pequeño sobre fondos claros.", "section": "colors" },
+      { "name": "Controlled Compression", "body": "Los titulares pueden ser compactos, pero el espaciado entre letras no debe superar -0.04em.", "section": "typography" },
+      { "name": "Functional Depth", "body": "Una superficie se separa mediante borde o sombra según su función.", "section": "elevation" }
+    ],
+    "dos": ["Usar el logotipo oficial sin deformarlo.", "Priorizar fotografías reales aprobadas por Simons.", "Probar a 320, 390, 768 y 1440 px."],
+    "donts": ["No copiar la identidad de Colorisa.", "No inventar productos, precios ni afirmaciones.", "No añadir comercio electrónico fuera del alcance confirmado."]
+  }
+}

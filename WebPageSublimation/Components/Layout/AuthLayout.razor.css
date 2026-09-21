@@ -1,0 +1,40 @@
+.auth-shell {
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    padding: 5.5rem 1rem 2rem;
+    position: relative;
+    overflow: hidden;
+    background:
+        linear-gradient(125deg, transparent 0 67%, rgba(175, 255, 34, .12) 67% 73%, transparent 73%),
+        #f4f5f1;
+}
+
+.auth-brand {
+    min-height: 44px;
+    position: absolute;
+    top: 1.25rem;
+    left: clamp(1rem, 4vw, 3rem);
+    display: flex;
+    align-items: center;
+    gap: .65rem;
+    color: #10120f;
+    font-size: 1.1rem;
+    font-weight: 900;
+    letter-spacing: .08em;
+    text-decoration: none;
+}
+
+.auth-brand-mark {
+    display: block;
+    width: 2.4rem;
+    height: 2.4rem;
+    object-fit: cover;
+}
+
+.auth-brand small {
+    display: block;
+    color: #5d6259;
+    font-size: .55rem;
+    letter-spacing: .22em;
+}

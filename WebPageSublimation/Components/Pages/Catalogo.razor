@@ -1,0 +1,8 @@
+@page "/catalogo"
+@attribute [Authorize]
+@inject CatalogoService CatalogoService
+<PageTitle>Catálogo | Simons Publicidad</PageTitle>
+<header class="page-heading"><span>Catálogo comercial</span><h1>Productos disponibles</h1><p>Los precios se calculan y conservan en el servidor al crear una operación.</p></header>
+<form class="catalogo-search" method="get"><label for="buscar">Buscar productos</label><input id="buscar" name="q" value="@Q" placeholder="Nombre o descripción"/><button>Buscar</button></form>
+@if(Productos.Count==0){<section class="empty-state"><strong>Catálogo en preparación</strong><h2>No hay productos disponibles todavía.</h2><p>El administrador publicará aquí los productos confirmados.</p></section>}else{<section class="catalogo-grid">@foreach(var producto in Productos){<article class="producto-publico">@if(producto.ImagenId is not null){<img src="/media/productos/@producto.ImagenId" alt="@producto.Nombre" loading="lazy"/>}<span>@producto.Categoria</span><h2>@producto.Nombre</h2><p>@producto.Descripcion</p>@if(producto.Variantes.Count>0){<small>@string.Join(" · ",producto.Variantes.Select(x=>x.Nombre))</small>}<strong>@(producto.PrecioEsReferencial?"Desde ":string.Empty)@producto.PrecioComercial.ToString("C",new System.Globalization.CultureInfo("es-BO"))</strong>@if(producto.PrecioEsReferencial){<small>Precio referencial; todavía no está disponible para proformas o pedidos.</small>}</article>}</section>}
+@code { [SupplyParameterFromQuery(Name="q")] public string? Q{get;set;} private IReadOnlyList<ProductoResumen> Productos=[]; protected override async Task OnParametersSetAsync()=>Productos=await CatalogoService.ListarProductosAsync(Q,true); }

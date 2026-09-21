@@ -1,0 +1,28 @@
+@page "/productos"
+@layout PublicLayout
+@inject CatalogoService CatalogoService
+<PageTitle>Productos | Simons Publicidad</PageTitle>
+<HeadContent>
+    <meta name="description" content="Explora los productos personalizados publicados por Simons Publicidad y solicita una cotización según las características de tu trabajo." />
+    <meta property="og:title" content="Productos | Simons Publicidad" />
+    <meta property="og:description" content="Catálogo de productos personalizados publicados por Simons Publicidad." />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="/images/simons-logo.png" />
+</HeadContent>
+<header class="public-page-heading"><h1>Productos</h1><p>Explora los productos activos publicados por Simons. Las características finales dependen de cada trabajo.</p></header>
+<form class="public-search" method="get">
+    <label for="q">Buscar por nombre o descripción<input id="q" name="q" value="@Q" placeholder="Ej.: taza personalizada" /></label>
+    <label for="categoria">Familia de productos<select id="categoria" name="categoria"><option value="">Todas las familias</option>@foreach(var categoria in Categorias){<option value="@categoria.Id" selected="@(Categoria == categoria.Id.ToString())">@categoria.Nombre</option>}</select></label>
+    <button>Ver resultados <span>→</span></button>
+</form>
+@if(Productos.Count==0){<section class="public-empty"><strong>@(HayFiltros ? "Sin resultados" : "Catálogo en preparación")</strong><h2>@(HayFiltros ? "No encontramos productos con esos criterios." : "Estamos preparando los primeros productos.")</h2><p>@(HayFiltros ? "Prueba otra búsqueda o consulta directamente con Simons." : "Puedes contarnos qué necesitas mientras se publica el catálogo confirmado.")</p><div>@if(HayFiltros){<a href="/productos">Limpiar filtros</a>}<a class="empty-action" href="/solicitar-cotizacion">Solicitar cotización →</a></div></section>}else{<section class="public-products" aria-label="Resultados del catálogo">@foreach(var producto in Productos){<article>@if(producto.ImagenId is not null){<img src="/media/productos/@producto.ImagenId" alt="@producto.Nombre" loading="lazy" width="640" height="480" />}else{<div class="product-placeholder" aria-hidden="true">SIMONS</div>}<span>@producto.Categoria</span><h2>@producto.Nombre</h2>@if(!string.IsNullOrWhiteSpace(producto.Descripcion)){<p>@producto.Descripcion</p>}@if(producto.Variantes.Count>0){<small>@string.Join(" · ",producto.Variantes.Select(x=>x.Nombre))</small>}<strong>@(producto.PrecioEsReferencial?"Desde ":string.Empty)@producto.PrecioComercial.ToString("C",Moneda)</strong>@if(producto.PrecioEsReferencial){<small>Precio referencial. La cotización final depende de cantidad y personalización.</small>}<a href="@CotizacionUrl(producto)">Consultar este producto →</a></article>}</section>}
+@code {
+ private static readonly System.Globalization.CultureInfo Moneda=new("es-BO");
+ [SupplyParameterFromQuery(Name="q")] public string? Q{get;set;}
+ [SupplyParameterFromQuery(Name="categoria")] public string? Categoria{get;set;}
+ private IReadOnlyList<ProductoResumen> Productos=[];
+ private IReadOnlyList<CategoriaResumen> Categorias=[];
+ private bool HayFiltros=>!string.IsNullOrWhiteSpace(Q)||!string.IsNullOrWhiteSpace(Categoria);
+ protected override async Task OnParametersSetAsync(){Categorias=(await CatalogoService.ListarCategoriasAsync()).Where(x=>x.IsActive).ToList();Guid? categoriaId=Guid.TryParse(Categoria,out var parsed)?parsed:null;Productos=await CatalogoService.ListarProductosAsync(Q,true,categoriaId);}
+ private static string CotizacionUrl(ProductoResumen producto)=>$"/solicitar-cotizacion?producto={Uri.EscapeDataString(producto.Nombre)}";
+}

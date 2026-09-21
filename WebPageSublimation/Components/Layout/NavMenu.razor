@@ -1,0 +1,46 @@
+<div class="nav-heading">
+    <a class="brand" href="/" aria-label="Inicio de Simons">
+        <img class="brand-mark" src="/images/simons-logo.png" alt="" />
+        <span class="brand-copy">SIMONS <small>PUBLICIDAD</small></span>
+    </a>
+    <label class="nav-toggle" for="nav-menu-toggle" aria-label="Abrir navegación"><span></span><span></span><span></span></label>
+</div>
+
+<input id="nav-menu-toggle" type="checkbox" class="nav-toggle-input" aria-label="Mostrar u ocultar navegación" aria-controls="navigation-content" />
+<div id="navigation-content" class="nav-scrollable">
+    <nav class="nav-links" aria-label="Navegación principal">
+        <NavLink class="nav-link" href="" Match="NavLinkMatch.All">Inicio</NavLink>
+        <AuthorizeView Roles="@Roles.Administrador">
+            <Authorized>
+                <span class="nav-section">Administración</span>
+                <NavLink class="nav-link" href="admin">Panel de control</NavLink>
+                <NavLink class="nav-link" href="admin/promotores">Promotores</NavLink>
+                <NavLink class="nav-link" href="admin/catalogo">Catálogo</NavLink>
+                <NavLink class="nav-link" href="admin/clientes">Clientes</NavLink>
+                <NavLink class="nav-link" href="admin/proformas">Proformas</NavLink>
+                <NavLink class="nav-link" href="admin/pedidos">Pedidos</NavLink>
+                <NavLink class="nav-link" href="admin/finanzas">Comisiones</NavLink>
+                <NavLink class="nav-link" href="admin/solicitudes">Solicitudes públicas</NavLink>
+            </Authorized>
+        </AuthorizeView>
+        <AuthorizeView Roles="@Roles.Promotor">
+            <Authorized>
+                <span class="nav-section">Área comercial</span>
+                <NavLink class="nav-link" href="promotor">Mi espacio</NavLink>
+                <NavLink class="nav-link" href="catalogo">Catálogo</NavLink>
+                <NavLink class="nav-link" href="clientes">Mis clientes</NavLink>
+                <NavLink class="nav-link" href="proformas">Mis proformas</NavLink>
+                <NavLink class="nav-link" href="pedidos">Mis pedidos</NavLink>
+            </Authorized>
+        </AuthorizeView>
+    </nav>
+    <AuthorizeView>
+        <Authorized>
+            <form method="post" action="/cuenta/salir" class="logout-form">
+                <AntiforgeryToken />
+                <input type="hidden" name="returnUrl" value="/cuenta/ingresar" />
+                <button type="submit">Cerrar sesión <span aria-hidden="true">→</span></button>
+            </form>
+        </Authorized>
+    </AuthorizeView>
+</div>

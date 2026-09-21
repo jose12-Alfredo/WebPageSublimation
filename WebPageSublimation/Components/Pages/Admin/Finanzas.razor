@@ -1,0 +1,129 @@
+@page "/admin/finanzas"
+@attribute [Authorize(Roles = Roles.Administrador)]
+@inject ComisionService ComisionService
+@inject PromotorService PromotorService
+
+<PageTitle>Comisiones | Simons Publicidad</PageTitle>
+
+<header class="page-heading">
+    <span>Administración / comisiones</span>
+    <h1>Calculadora de comisiones</h1>
+    <p>Calcula una estimación únicamente sobre pedidos de proformas marcados como completados.</p>
+</header>
+
+<form method="get" class="commission-filters">
+    <label>
+        Pedido registrado desde
+        <input type="date" name="desde" value="@Desde?.ToString("yyyy-MM-dd")" />
+    </label>
+    <label>
+        Pedido registrado hasta
+        <input type="date" name="hasta" value="@Hasta?.ToString("yyyy-MM-dd")" />
+    </label>
+    <label>
+        Promotor
+        <select name="promotorId">
+            <option value="">Todos los promotores</option>
+            @foreach (var promotor in Promotores)
+            {
+                <option value="@promotor.Id" selected="@(promotor.Id == PromotorId)">@promotor.Nombre</option>
+            }
+        </select>
+    </label>
+    <label>
+        Porcentaje de comisión
+        <span class="percentage-field">
+            <input type="text" inputmode="decimal" name="porcentaje" value="@Porcentaje"
+                   placeholder="Ej. 10" aria-describedby="percentage-help" required />
+            <span aria-hidden="true">%</span>
+        </span>
+    </label>
+    <button class="primary-action">Calcular comisión</button>
+</form>
+<p id="percentage-help" class="form-hint">Acepta hasta cuatro decimales. Las fechas corresponden al registro del pedido y el porcentaje se usa solamente para este cálculo.</p>
+
+@if (Resultado is not null && !Resultado.Success)
+{
+    <p class="feedback error" role="alert">@Resultado.Message</p>
+}
+else if (Resultado is not null)
+{
+    <section class="commission-metrics" aria-label="Resumen del cálculo">
+        <article>
+            <span>Pedidos de proformas completados</span>
+            <strong>@Resultado.ImporteVentas.ToString("C", Moneda)</strong>
+            <small>@Resultado.Pedidos pedidos incluidos</small>
+        </article>
+        <article>
+            <span>Porcentaje aplicado</span>
+            <strong>@(Resultado.Porcentaje is null ? "—" : $"{Resultado.Porcentaje:0.####} %")</strong>
+            <small>Definido por el administrador</small>
+        </article>
+        <article class="commission-total">
+            <span>Comisión calculada</span>
+            <strong>@(Resultado.ComisionTotal?.ToString("C", Moneda) ?? "—")</strong>
+            <small>Estimación sobre pedidos de proformas</small>
+        </article>
+    </section>
+
+    <section class="data-card commission-detail">
+        <div class="section-heading">
+            <div>
+                <span>Detalle</span>
+                <h2>Comisión por promotor</h2>
+            </div>
+            <strong>@Resultado.PorPromotor.Count promotores</strong>
+        </div>
+
+        @if (Resultado.PorPromotor.Count == 0)
+        {
+            <div class="empty-result">
+                <strong>No hay pedidos de proformas completados en este período.</strong>
+                <p>Convierte una proforma en pedido y márcalo como completado desde Administración → Pedidos.</p>
+            </div>
+        }
+        else
+        {
+            <div class="commission-table" role="table" aria-label="Comisiones calculadas por promotor">
+                <div class="table-header" role="row">
+                    <span role="columnheader">Promotor</span>
+                    <span role="columnheader">Pedidos</span>
+                    <span role="columnheader">Ventas</span>
+                    <span role="columnheader">Comisión</span>
+                </div>
+                @foreach (var fila in Resultado.PorPromotor)
+                {
+                    <div class="table-row" role="row">
+                        <strong role="cell" data-label="Promotor">@fila.PromotorNombre</strong>
+                        <span role="cell" data-label="Pedidos">@fila.Pedidos</span>
+                        <span role="cell" data-label="Ventas">@fila.ImporteVentas.ToString("C", Moneda)</span>
+                        <strong role="cell" data-label="Comisión">@(fila.ComisionCalculada?.ToString("C", Moneda) ?? "—")</strong>
+                    </div>
+                }
+            </div>
+        }
+    </section>
+
+    <aside class="calculation-note">
+        <strong>Cómo se calcula</strong>
+        <p>Importe de pedidos originados en proformas y completados × porcentaje ÷ 100. Este resultado es una estimación administrativa; no marca la comisión como pagada.</p>
+    </aside>
+}
+
+@code {
+    private static readonly System.Globalization.CultureInfo Moneda = new("es-BO");
+
+    [SupplyParameterFromQuery] public DateOnly? Desde { get; set; }
+    [SupplyParameterFromQuery] public DateOnly? Hasta { get; set; }
+    [SupplyParameterFromQuery] public Guid? PromotorId { get; set; }
+    [SupplyParameterFromQuery] public string? Porcentaje { get; set; }
+
+    private IReadOnlyList<PromotorResumen> Promotores = [];
+    private ResultadoComision? Resultado;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        Promotores = await PromotorService.ListarAsync();
+        Resultado = await ComisionService.CalcularAsync(Desde, Hasta, PromotorId, Porcentaje);
+    }
+}

@@ -1,0 +1,37 @@
+@inherits LayoutComponentBase
+@inject IConfiguration Configuration
+
+<div class="public-shell">
+    <a class="skip-link" href="#contenido-principal">Saltar al contenido</a>
+    <header class="public-header">
+        <div class="public-header-inner">
+            <a class="public-brand" href="/" aria-label="Simons Tu Publicidad, inicio"><img src="/images/simons-logo-horizontal.png" alt="Simons Tu Publicidad" /></a>
+            <input id="public-nav-toggle" class="public-nav-toggle" type="checkbox" aria-label="Abrir navegación" aria-controls="public-navigation" />
+            <label for="public-nav-toggle" class="public-nav-button" aria-hidden="true"><i></i><i></i><i></i></label>
+            <nav id="public-navigation" aria-label="Navegación pública">
+                <NavLink href="/" Match="NavLinkMatch.All">Inicio</NavLink>
+                <NavLink href="/productos">Productos</NavLink>
+                <NavLink href="/solicitar-cotizacion">Solicitar cotización</NavLink>
+                <AuthorizeView>
+                    <Authorized Context="authState">
+                        @if (authState.User.IsInRole(Roles.Administrador))
+                        {
+                            <a class="access" href="/admin">Administración</a>
+                        }
+                        else if (authState.User.IsInRole(Roles.Promotor))
+                        {
+                            <a class="access" href="/promotor">Área comercial</a>
+                        }
+                    </Authorized>
+                    <NotAuthorized>
+                        <a class="access" href="/cuenta/ingresar">Acceso equipo</a>
+                    </NotAuthorized>
+                </AuthorizeView>
+            </nav>
+        </div>
+    </header>
+    <main id="contenido-principal">@Body</main>
+    <footer class="public-footer"><div class="footer-brand"><img src="/images/simons-logo-horizontal.png" alt="Simons Tu Publicidad" /><span>Publicidad · Sublimación · Imprenta</span></div><div class="footer-actions"><a href="/solicitar-cotizacion">Cuéntanos qué necesitas <span>→</span></a>@if(!string.IsNullOrWhiteSpace(WhatsAppUrl)){<a href="@WhatsAppUrl" target="_blank" rel="noopener noreferrer">WhatsApp <span>↗</span></a>}</div></footer>
+</div>
+<div id="blazor-error-ui" data-nosnippet>Ocurrió un error inesperado. <a href="." class="reload">Recargar</a></div>
+@code { private string? WhatsAppUrl { get { var raw=Configuration["PublicContact:WhatsApp"]; if(string.IsNullOrWhiteSpace(raw)) return null; var digits=new string(raw.Where(char.IsDigit).ToArray()); return digits.Length<8?null:$"https://wa.me/{digits}"; } } }

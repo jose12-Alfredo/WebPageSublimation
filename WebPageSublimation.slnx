@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="WebPageSublimation/WebPageSublimation.csproj" />
+  <Project Path="tests/WebPageSublimation.Tests/WebPageSublimation.Tests.csproj" />
+</Solution>

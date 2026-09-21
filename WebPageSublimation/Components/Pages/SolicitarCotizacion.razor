@@ -1,0 +1,20 @@
+@page "/solicitar-cotizacion"
+@layout PublicLayout
+
+<PageTitle>Solicitar cotización | Simons Publicidad</PageTitle>
+<HeadContent><meta name="description" content="Solicita una cotización a Simons Publicidad para productos personalizados, sublimación, imprenta y material publicitario." /></HeadContent>
+<section class="request-shell">
+    <div class="request-copy"><span>SOLICITUD PÚBLICA</span><h1>Hablemos de tu idea.</h1><p>Describe el producto, cantidad y características que necesitas. Este formulario no crea un precio automático: Simons revisará la información antes de responder.</p><ol><li><b>01</b> Describe el trabajo</li><li><b>02</b> Deja un medio de contacto</li><li><b>03</b> Simons prepara la respuesta</li></ol></div>
+    <form class="request-form" method="post" action="/solicitar-cotizacion">
+        <AntiforgeryToken />
+        @if(!string.IsNullOrWhiteSpace(Mensaje)){<p class="public-feedback @Tipo" role="status">@Mensaje</p>}
+        <label for="nombre">Tu nombre</label><input id="nombre" name="nombre" maxlength="160" required />
+        <label for="empresa">Empresa <small>opcional</small></label><input id="empresa" name="empresa" maxlength="180" />
+        <div class="contact-pair"><label for="telefono">Teléfono<input id="telefono" name="telefono" maxlength="40" inputmode="tel" /></label><label for="email">Correo<input id="email" name="email" maxlength="254" type="email" /></label></div>
+        <p class="contact-help">Completa al menos un teléfono o correo.</p>
+        @if(!string.IsNullOrWhiteSpace(Producto)){<p class="selected-product"><span>Producto consultado</span><strong>@Producto</strong></p>}
+        <label for="detalle">¿Qué necesitas?</label><textarea id="detalle" name="detalle" maxlength="2000" required placeholder="Producto, cantidad, medidas, colores o cualquier detalle útil">@DetalleInicial</textarea>
+        <button>Enviar solicitud <span>→</span></button>
+    </form>
+</section>
+@code { [SupplyParameterFromQuery(Name="mensaje")] public string? Mensaje{get;set;} [SupplyParameterFromQuery(Name="tipo")] public string? Tipo{get;set;} [SupplyParameterFromQuery(Name="producto")] public string? Producto{get;set;} private string DetalleInicial=>string.IsNullOrWhiteSpace(Producto)?string.Empty:$"Quiero cotizar: {Producto.Trim()}.\nCantidad y detalles: "; }

@@ -1,0 +1,122 @@
+@page "/admin/clientes"
+@attribute [Authorize(Roles = Roles.Administrador)]
+@inject ClienteService ServicioClientes
+@inject PromotorService ServicioPromotores
+
+<PageTitle>Clientes | Simons Publicidad</PageTitle>
+
+<header class="page-heading">
+    <span>Administración / cartera</span>
+    <h1>Clientes</h1>
+    <p>Registra la información confirmada y decide qué promotores pueden consultar cada cliente.</p>
+</header>
+
+@if (!string.IsNullOrWhiteSpace(Mensaje))
+{
+    <p class="feedback @Tipo" role="status">@Mensaje</p>
+}
+
+<section class="clientes-layout">
+    <form class="data-card cliente-form" method="post" action="/admin/clientes/crear">
+        <AntiforgeryToken />
+        <span class="section-kicker">Nuevo registro</span>
+        <h2>Agregar cliente</h2>
+        <p>Solo el nombre o razón social es obligatorio.</p>
+
+        <label for="nombre">Nombre o razón social</label>
+        <input id="nombre" name="nombre" maxlength="180" required />
+        <div class="form-pair">
+            <label>CI/NIT <input name="nit" maxlength="40" /></label>
+            <label>Persona de contacto <input name="personaContacto" maxlength="160" /></label>
+        </div>
+        <div class="form-pair">
+            <label>Teléfono <input name="telefono" maxlength="40" inputmode="tel" /></label>
+            <label>WhatsApp <input name="whatsapp" maxlength="40" inputmode="tel" /></label>
+        </div>
+        <label for="email">Correo</label>
+        <input id="email" name="email" maxlength="254" type="email" />
+        <label for="direccion">Dirección</label>
+        <input id="direccion" name="direccion" maxlength="300" />
+        <label for="notas">Observaciones</label>
+        <textarea id="notas" name="notas" maxlength="1500"></textarea>
+        <button class="primary-action">Registrar cliente <span aria-hidden="true">→</span></button>
+    </form>
+
+    <section class="clientes-list" aria-labelledby="lista-clientes">
+        <div class="list-heading">
+            <div><span class="section-kicker">Cartera registrada</span><h2 id="lista-clientes">Clientes</h2></div>
+            <span class="count">@Listado.Count</span>
+        </div>
+        @if (Listado.Count == 0)
+        {
+            <div class="empty-list"><strong>Aún no hay clientes.</strong><p>El módulo comienza vacío.</p></div>
+        }
+        else
+        {
+            @foreach (var cliente in Listado)
+            {
+                <article class="cliente-card">
+                    <div class="cliente-title">
+                        <div><span class="status @(cliente.IsActive ? "active" : "inactive")">@(cliente.IsActive ? "Activo" : "Desactivado")</span><h3>@cliente.Nombre</h3></div>
+                        @if (cliente.IsActive)
+                        {
+                            <form method="post" action="@($"/admin/clientes/{cliente.Id}/desactivar")">
+                                <AntiforgeryToken /><button class="secondary-action">Desactivar</button>
+                            </form>
+                        }
+                    </div>
+                    <dl class="cliente-data">
+                        @if (!string.IsNullOrWhiteSpace(cliente.Nit)) { <div><dt>CI/NIT</dt><dd>@cliente.Nit</dd></div> }
+                        @if (!string.IsNullOrWhiteSpace(cliente.PersonaContacto)) { <div><dt>Contacto</dt><dd>@cliente.PersonaContacto</dd></div> }
+                        @if (!string.IsNullOrWhiteSpace(cliente.Telefono)) { <div><dt>Teléfono</dt><dd>@cliente.Telefono</dd></div> }
+                        @if (!string.IsNullOrWhiteSpace(cliente.WhatsApp)) { <div><dt>WhatsApp</dt><dd>@cliente.WhatsApp</dd></div> }
+                        @if (!string.IsNullOrWhiteSpace(cliente.Email)) { <div><dt>Correo</dt><dd>@cliente.Email</dd></div> }
+                        @if (!string.IsNullOrWhiteSpace(cliente.Direccion)) { <div><dt>Dirección</dt><dd>@cliente.Direccion</dd></div> }
+                    </dl>
+                    <div class="asignaciones">
+                        <strong>Acceso de promotores</strong>
+                        @if (cliente.Promotores.Count == 0) { <p>Sin promotores asignados.</p> }
+                        else
+                        {
+                            <div class="chips">
+                                @foreach (var promotor in cliente.Promotores)
+                                {
+                                    <form method="post" action="@($"/admin/clientes/{cliente.Id}/promotores/{promotor.Id}/desasignar")">
+                                        <AntiforgeryToken /><button title="Retirar acceso">@promotor.Nombre <span aria-hidden="true">×</span></button>
+                                    </form>
+                                }
+                            </div>
+                        }
+                        @if (cliente.IsActive && PromotoresActivos.Any(p => cliente.Promotores.All(a => a.Id != p.Id)))
+                        {
+                            <form class="asignar-form" method="post" action="@($"/admin/clientes/{cliente.Id}/asignar")">
+                                <AntiforgeryToken />
+                                <label>Asignar promotor
+                                    <select name="promotorId" required>
+                                        <option value="">Selecciona</option>
+                                        @foreach (var promotor in PromotoresActivos.Where(p => cliente.Promotores.All(a => a.Id != p.Id)))
+                                        { <option value="@promotor.Id">@promotor.Nombre</option> }
+                                    </select>
+                                </label>
+                                <button class="secondary-action">Asignar</button>
+                            </form>
+                        }
+                    </div>
+                </article>
+            }
+        }
+    </section>
+</section>
+
+@code {
+    [SupplyParameterFromQuery(Name = "mensaje")] public string? Mensaje { get; set; }
+    [SupplyParameterFromQuery(Name = "tipo")] public string? Tipo { get; set; }
+    private IReadOnlyList<ClienteResumen> Listado { get; set; } = [];
+    private IReadOnlyList<PromotorResumen> PromotoresActivos { get; set; } = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        Listado = await ServicioClientes.ListarParaAdministradorAsync();
+        PromotoresActivos = (await ServicioPromotores.ListarAsync()).Where(x => x.IsActive).ToList();
+    }
+}

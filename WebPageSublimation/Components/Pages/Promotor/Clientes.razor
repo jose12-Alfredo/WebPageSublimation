@@ -1,0 +1,42 @@
+@page "/clientes"
+@attribute [Authorize(Roles = Roles.Promotor)]
+@inject ClienteService ServicioClientes
+
+<PageTitle>Mis clientes | Simons Publicidad</PageTitle>
+<header class="page-heading">
+    <span>Área comercial / cartera</span>
+    <h1>Mis clientes</h1>
+    <p>Consulta los clientes activos que fueron asignados a tu cuenta.</p>
+</header>
+
+@if (Listado.Count == 0)
+{
+    <section class="empty-state"><strong>Cartera</strong><h2>No tienes clientes asignados.</h2><p>El administrador controla el acceso a cada registro.</p></section>
+}
+else
+{
+    <section class="mis-clientes">
+        @foreach (var cliente in Listado)
+        {
+            <article>
+                <span>Cliente</span><h2>@cliente.Nombre</h2>
+                @if (!string.IsNullOrWhiteSpace(cliente.PersonaContacto)) { <p><b>Contacto</b>@cliente.PersonaContacto</p> }
+                @if (!string.IsNullOrWhiteSpace(cliente.Telefono)) { <p><b>Teléfono</b><a href="tel:@cliente.Telefono">@cliente.Telefono</a></p> }
+                @if (!string.IsNullOrWhiteSpace(cliente.WhatsApp)) { <p><b>WhatsApp</b>@cliente.WhatsApp</p> }
+                @if (!string.IsNullOrWhiteSpace(cliente.Email)) { <p><b>Correo</b><a href="mailto:@cliente.Email">@cliente.Email</a></p> }
+                @if (!string.IsNullOrWhiteSpace(cliente.Direccion)) { <p><b>Dirección</b>@cliente.Direccion</p> }
+                @if (!string.IsNullOrWhiteSpace(cliente.Notas)) { <p class="notas"><b>Observaciones</b>@cliente.Notas</p> }
+            </article>
+        }
+    </section>
+}
+
+@code {
+    [CascadingParameter] private Task<AuthenticationState> AuthenticationStateTask { get; set; } = default!;
+    private IReadOnlyList<ClienteResumen> Listado { get; set; } = [];
+    protected override async Task OnInitializedAsync()
+    {
+        var state = await AuthenticationStateTask;
+        Listado = await ServicioClientes.ListarParaPromotorAsync(state.User);
+    }
+}

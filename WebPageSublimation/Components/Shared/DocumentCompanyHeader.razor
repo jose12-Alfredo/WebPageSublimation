@@ -1,0 +1,6 @@
+@inject IConfiguration Configuration
+<div class="company-document-header">
+ @if(!string.IsNullOrWhiteSpace(LogoUrl)){<img src="@LogoUrl" alt="Logotipo de Simons Publicidad" />}
+ <div><strong>@Name</strong>@if(!string.IsNullOrWhiteSpace(LegalName)){<span>@LegalName</span>}@if(!string.IsNullOrWhiteSpace(TaxId)){<span>NIT: @TaxId</span>}@if(!string.IsNullOrWhiteSpace(Address)){<span>@Address</span>}@if(!string.IsNullOrWhiteSpace(Phone)){<span>@Phone</span>}</div>
+</div>
+@code{private string Name=>Configuration["Company:Name"]??"Simons Publicidad";private string? LegalName=>Configuration["Company:LegalName"];private string? TaxId=>Configuration["Company:TaxId"];private string? Address=>Configuration["Company:Address"];private string? Phone=>Configuration["Company:Phone"];private string? LogoUrl=>Configuration["Company:LogoUrl"];}

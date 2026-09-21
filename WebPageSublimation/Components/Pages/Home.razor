@@ -1,0 +1,125 @@
+@page "/"
+@layout PublicLayout
+@inject CatalogoService CatalogoService
+
+<PageTitle>Simons Publicidad | Productos personalizados</PageTitle>
+<HeadContent>
+    <meta name="description" content="Explora productos personalizados de Simons Publicidad y solicita una cotización según tu idea, cantidad y características." />
+    <meta property="og:title" content="Simons Publicidad | Ideas que toman forma" />
+    <meta property="og:description" content="Sublimación, imprenta, publicidad y productos personalizados." />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="/images/simons-logo.png" />
+</HeadContent>
+
+@{
+    var destacados = Productos.Where(x => x.ImagenId is not null).Take(4).ToList();
+    var principal = destacados.FirstOrDefault();
+}
+
+<section class="home-hero">
+    <div class="hero-copy">
+        <h1><span>Tu idea.</span><strong>Hecha producto.</strong></h1>
+        <p>Sublimación, imprenta y publicidad para convertir lo que imaginas en piezas personalizadas.</p>
+        <div class="hero-actions">
+            <a class="action action-accent" href="/solicitar-cotizacion">Cotiza tu idea <span aria-hidden="true">→</span></a>
+            <a class="action action-outline" href="/productos">Ver catálogo</a>
+        </div>
+    </div>
+    <div class="hero-visual" aria-label="Productos personalizados de Simons">
+        @if (principal is not null)
+        {
+            <figure class="hero-main-photo">
+                <img src="/media/productos/@principal.ImagenId" alt="@principal.Nombre" width="900" height="1200" />
+                <figcaption><span>@principal.Categoria</span><strong>@principal.Nombre</strong></figcaption>
+            </figure>
+            @if (destacados.Count > 1)
+            {
+                <figure class="hero-small-photo hero-small-one" aria-hidden="true"><img src="/media/productos/@destacados[1].ImagenId" alt="" width="480" height="480" /></figure>
+            }
+            @if (destacados.Count > 2)
+            {
+                <figure class="hero-small-photo hero-small-two" aria-hidden="true"><img src="/media/productos/@destacados[2].ImagenId" alt="" width="480" height="480" /></figure>
+            }
+        }
+        else
+        {
+            <div class="hero-empty"><img src="/images/simons-logo.png" alt="" /><strong>SIMONS</strong><span>PUBLICIDAD</span></div>
+        }
+    </div>
+</section>
+
+<section class="service-ribbon" aria-label="Servicios de Simons">
+    <article><strong>Sublimación</strong><span>Productos personalizados para cada trabajo.</span></article>
+    <article><strong>Imprenta</strong><span>Soluciones impresas para comunicar tu marca.</span></article>
+    <article><strong>Publicidad</strong><span>Materiales comerciales y promocionales.</span></article>
+</section>
+
+<section class="brand-statement reveal" data-reveal>
+    @if (destacados.Count > 1)
+    {
+        <figure class="statement-photo"><img src="/media/productos/@destacados[1].ImagenId" alt="@destacados[1].Nombre" loading="lazy" width="960" height="720" /></figure>
+    }
+    <div>
+        <h2>Una idea puede vivir en más de un producto.</h2>
+        <p>Explora las opciones publicadas por Simons y cuéntanos qué necesitas personalizar. La propuesta final se define según el producto, la cantidad y las características del trabajo.</p>
+        <a class="inline-link" href="/solicitar-cotizacion">Empezar una cotización <span aria-hidden="true">→</span></a>
+    </div>
+</section>
+
+<section class="catalog-showcase">
+    <header class="section-heading reveal" data-reveal>
+        <h2>Productos que ya puedes consultar.</h2>
+        <p>Fotografías reales y precios referenciales para comenzar la conversación.</p>
+        <a class="inline-link" href="/productos">Ver catálogo completo <span aria-hidden="true">→</span></a>
+    </header>
+    @if (Productos.Count == 0)
+    {
+        <p class="catalog-empty">El catálogo está en preparación. Puedes solicitar una cotización mientras publicamos los primeros productos.</p>
+    }
+    else
+    {
+        <div class="home-product-grid">
+            @foreach (var producto in Productos.Take(4))
+            {
+                <article class="home-product reveal" data-reveal>
+                    <a class="product-image" href="@CotizacionUrl(producto)" aria-label="Consultar @producto.Nombre">
+                        @if (producto.ImagenId is not null)
+                        {
+                            <img src="/media/productos/@producto.ImagenId" alt="@producto.Nombre" loading="lazy" width="720" height="900" />
+                        }
+                        else
+                        {
+                            <span class="image-placeholder">SIMONS</span>
+                        }
+                    </a>
+                    <span class="product-family">@producto.Categoria</span>
+                    <h3>@producto.Nombre</h3>
+                    <div><strong>@(producto.PrecioEsReferencial ? "Desde " : string.Empty)@producto.PrecioComercial.ToString("C", Moneda)</strong><a href="@CotizacionUrl(producto)" aria-label="Cotizar @producto.Nombre">→</a></div>
+                </article>
+            }
+        </div>
+    }
+</section>
+
+<section class="process-section">
+    <header class="section-heading reveal" data-reveal><h2>De tu idea a una cotización clara.</h2><p>Un recorrido directo para definir lo que necesitas antes de producir.</p></header>
+    <ol class="process-list">
+        <li class="reveal" data-reveal><span>01</span><div><h3>Cuéntanos qué necesitas</h3><p>Comparte el producto, la cantidad y las características que tienes en mente.</p></div></li>
+        <li class="reveal" data-reveal><span>02</span><div><h3>Definimos el alcance</h3><p>El equipo revisa la información necesaria para preparar la propuesta.</p></div></li>
+        <li class="reveal" data-reveal><span>03</span><div><h3>Recibes la cotización</h3><p>La respuesta conserva el detalle del producto y las condiciones acordadas.</p></div></li>
+    </ol>
+</section>
+
+<section class="home-cta reveal" data-reveal>
+    <div><h2>¿Qué quieres personalizar?</h2><p>Empieza con una idea. Simons te ayuda a convertirla en una solicitud concreta.</p></div>
+    <a class="action action-dark" href="/solicitar-cotizacion">Solicitar cotización <span aria-hidden="true">→</span></a>
+</section>
+
+@code {
+    private static readonly System.Globalization.CultureInfo Moneda = new("es-BO");
+    private IReadOnlyList<ProductoResumen> Productos = [];
+
+    protected override async Task OnInitializedAsync() => Productos = await CatalogoService.ListarProductosAsync(null, true);
+
+    private static string CotizacionUrl(ProductoResumen producto) => $"/solicitar-cotizacion?producto={Uri.EscapeDataString(producto.Nombre)}";
+}

@@ -1,0 +1,17 @@
+@page "/proformas"
+@attribute [Authorize(Roles = Roles.Promotor)]
+@inject ProformaService ServicioProformas
+
+<PageTitle>Mis proformas | Simons Publicidad</PageTitle>
+<header class="page-heading"><span>Área comercial</span><h1>Mis proformas</h1><p>Consulta tus documentos históricos o prepara una nueva propuesta.</p></header>
+<div class="page-actions"><a class="primary-action" href="/proformas/nueva">Nueva proforma <span>→</span></a></div>
+<section class="proforma-list">
+    @if (Listado.Count == 0) { <div class="empty-list"><strong>Aún no tienes proformas.</strong><p>Los precios quedarán congelados cuando crees la primera.</p></div> }
+    else { @foreach (var item in Listado) { <a class="proforma-row" href="@($"/proformas/{item.Id}")"><div><span>Proforma #@item.Numero</span><h2>@item.ClienteNombre</h2><p>@item.FechaUtc.ToString("dd/MM/yyyy HH:mm 'UTC'")</p></div><strong>@item.Total.ToString("C", Moneda)</strong></a> } }
+</section>
+@code {
+    private static readonly System.Globalization.CultureInfo Moneda = new("es-BO");
+    [CascadingParameter] private Task<AuthenticationState> AuthenticationStateTask { get; set; } = default!;
+    private IReadOnlyList<ProformaResumen> Listado { get; set; } = [];
+    protected override async Task OnInitializedAsync() { var state = await AuthenticationStateTask; Listado = await ServicioProformas.ListarParaPromotorAsync(state.User); }
+}

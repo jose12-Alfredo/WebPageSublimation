@@ -1,0 +1,39 @@
+@page "/admin/catalogo"
+@attribute [Authorize(Roles = Roles.Administrador)]
+@inject CatalogoService CatalogoService
+
+<PageTitle>Catálogo | Simons Publicidad</PageTitle>
+<header class="page-heading"><span>Administración / catálogo</span><h1>Productos, variantes e imágenes</h1><p>Los productos marcados como Referencial se muestran para consulta, pero no pueden usarse en proformas o pedidos. Desmarca esa opción y guarda cuando el precio comercial esté confirmado.</p></header>
+@if (!string.IsNullOrWhiteSpace(Mensaje)) { <p class="feedback @Tipo" role="status">@Mensaje</p> }
+
+<section class="catalogo-admin-grid">
+ <form class="data-card catalogo-form" method="post" action="/admin/catalogo/categorias"><AntiforgeryToken /><span class="section-kicker">Categorías</span><h2>Nueva categoría</h2><label for="categoria">Nombre</label><input id="categoria" name="nombre" maxlength="120" required /><button class="primary-action">Crear categoría <span>→</span></button></form>
+ <form class="data-card catalogo-form" method="post" action="/admin/catalogo/productos"><AntiforgeryToken /><span class="section-kicker">Productos</span><h2>Nuevo producto</h2><label for="producto">Nombre</label><input id="producto" name="nombre" maxlength="180" required /><label for="categoriaId">Categoría</label><select id="categoriaId" name="categoriaId" required><option value="">Selecciona una categoría</option>@foreach(var categoria in Categorias.Where(x=>x.IsActive)){<option value="@categoria.Id">@categoria.Nombre</option>}</select><label for="precio">Precio (Bs)</label><input id="precio" name="precio" inputmode="decimal" required /><label class="check-field"><input type="checkbox" name="precioReferencial" value="true" /> Mostrar como precio referencial “Desde”</label><label for="descripcion">Descripción</label><textarea id="descripcion" name="descripcion" maxlength="1000"></textarea><button class="primary-action">Crear producto <span>→</span></button></form>
+</section>
+
+<section class="category-admin data-card">
+ <div class="list-heading"><div><span class="section-kicker">Organización</span><h2>Categorías registradas</h2></div><span class="count">@Categorias.Count</span></div>
+ <div class="category-list">@foreach(var categoria in Categorias){<article><form method="post" action="/admin/catalogo/categorias/@categoria.Id/editar"><AntiforgeryToken/><input name="nombre" value="@categoria.Nombre" maxlength="120" required/><button class="secondary-action">Guardar</button></form><form method="post" action="/admin/catalogo/categorias/@categoria.Id/estado"><AntiforgeryToken/><input type="hidden" name="activo" value="@((!categoria.IsActive).ToString().ToLowerInvariant())"/><button class="@(categoria.IsActive?"danger-action":"primary-action")">@(categoria.IsActive?"Desactivar":"Activar")</button></form></article>}</div>
+</section>
+
+<section class="catalogo-table">
+ <div class="list-heading"><div><span class="section-kicker">Catálogo actual</span><h2>Productos registrados</h2></div><span class="count">@Productos.Count</span></div>
+ @if(Productos.Count==0){<div class="empty-list"><strong>No hay productos publicados.</strong><p>Las categorías y productos se administran desde este panel.</p></div>}
+ else {<div class="product-admin-list">@foreach(var producto in Productos){<article class="product-admin-card">
+  <div class="product-photo">@if(producto.ImagenId is not null){<img src="/media/productos/@producto.ImagenId" alt="Imagen actual de @producto.Nombre" />}else{<span>Sin imagen</span>}</div>
+  <div class="product-editor"><div class="product-state"><strong>@producto.Nombre</strong><div><span class="@(producto.IsActive ? "active" : "inactive")">@(producto.IsActive ? "Activo" : "Inactivo")</span>@if(producto.PrecioEsReferencial){<span class="reference">Referencial</span>}</div></div>
+   <form method="post" action="/admin/catalogo/productos/@producto.Id/editar" class="edit-grid"><AntiforgeryToken /><label>Nombre<input name="nombre" value="@producto.Nombre" maxlength="180" required /></label><label>Categoría<select name="categoriaId" required>@foreach(var categoria in Categorias.Where(x=>x.IsActive)){<option value="@categoria.Id" selected="@(categoria.Id==producto.CategoriaId)">@categoria.Nombre</option>}</select></label><label>Precio (Bs)<input name="precio" value="@producto.PrecioComercial.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture)" inputmode="decimal" required /></label><label class="check-field wide"><input type="checkbox" name="precioReferencial" value="true" checked="@producto.PrecioEsReferencial" /> Mostrar como precio referencial “Desde”</label><label class="wide">Descripción<textarea name="descripcion" maxlength="1000">@producto.Descripcion</textarea></label><button class="secondary-action">Guardar cambios</button></form>
+   <div class="tool-grid"><form method="post" enctype="multipart/form-data" action="/admin/catalogo/productos/@producto.Id/imagenes"><AntiforgeryToken /><label>Galería (hasta 8 JPG, PNG o WebP; 5 MB cada una)<input type="file" name="imagenes" accept="image/jpeg,image/png,image/webp" multiple required /></label><button class="secondary-action">Agregar imágenes</button></form><form method="post" action="/admin/catalogo/productos/@producto.Id/variantes"><AntiforgeryToken /><label>Nueva variante, talla o color<input name="nombre" maxlength="160" placeholder="Ej.: Talla M o Azul" required /></label><button class="secondary-action">Agregar variante</button></form></div>
+   @if(producto.Imagenes.Count>0){<div class="image-gallery" aria-label="Imágenes de @producto.Nombre">@foreach(var imagen in producto.Imagenes){<article class="@(imagen.EsPrincipal?"is-primary":null)"><img src="/media/productos/@imagen.Id" alt="Vista de @producto.Nombre" /><span>@(imagen.EsPrincipal?"Principal":$"Imagen {imagen.Orden+1}")</span><div>@if(!imagen.EsPrincipal){<form method="post" action="/admin/catalogo/productos/@producto.Id/imagenes/@imagen.Id/principal"><AntiforgeryToken/><button class="secondary-action">Usar como principal</button></form>}<form method="post" action="/admin/catalogo/productos/@producto.Id/imagenes/@imagen.Id/eliminar"><AntiforgeryToken/><button class="danger-action">Eliminar</button></form></div></article>}</div>}
+   @if(producto.Variantes.Count>0){<div class="variant-list">@foreach(var variante in producto.Variantes){<form method="post" action="/admin/catalogo/productos/@producto.Id/variantes/@variante.Id/estado"><AntiforgeryToken /><input type="hidden" name="activo" value="@((!variante.IsActive).ToString().ToLowerInvariant())" /><span class="@(!variante.IsActive ? "muted" : null)">@variante.Nombre</span><button>@(variante.IsActive ? "Desactivar" : "Activar")</button></form>}</div>}
+   <form method="post" action="/admin/catalogo/productos/@producto.Id/estado" class="state-form"><AntiforgeryToken /><input type="hidden" name="activo" value="@((!producto.IsActive).ToString().ToLowerInvariant())" /><button class="@(producto.IsActive ? "danger-action" : "primary-action")">@(producto.IsActive ? "Desactivar producto" : "Activar producto")</button></form>
+  </div></article>}</div>}
+</section>
+
+@code {
+ [SupplyParameterFromQuery(Name="mensaje")] public string? Mensaje{get;set;}
+ [SupplyParameterFromQuery(Name="tipo")] public string? Tipo{get;set;}
+ private IReadOnlyList<CategoriaResumen> Categorias=[];
+ private IReadOnlyList<ProductoResumen> Productos=[];
+ protected override async Task OnInitializedAsync(){Categorias=await CatalogoService.ListarCategoriasAsync(); Productos=await CatalogoService.ListarProductosAsync(null,false);}
+}

@@ -1,0 +1,55 @@
+@page "/admin"
+@attribute [Authorize(Roles = Roles.Administrador)]
+@inject DashboardService DashboardService
+@inject ClienteService ClienteService
+@inject PromotorService PromotorService
+
+<PageTitle>Administración | Simons Publicidad</PageTitle>
+<header class="page-heading"><span>Administración</span><h1>Pedidos y operaciones</h1><p>Los importes entregados son un indicador operativo. Simons aún debe confirmar cuándo se considera realizada una venta.</p></header>
+<form method="get" class="dashboard-filters">
+ <label>Desde<input type="date" name="desde" value="@Desde?.ToString("yyyy-MM-dd")" /></label>
+ <label>Hasta<input type="date" name="hasta" value="@Hasta?.ToString("yyyy-MM-dd")" /></label>
+ <label>Cliente<select name="clienteId"><option value="">Todos</option>@foreach(var c in Clientes){<option value="@c.Id" selected="@(c.Id==ClienteId)">@c.Nombre</option>}</select></label>
+ <label>Promotor<select name="promotorId"><option value="">Todos</option>@foreach(var p in Promotores){<option value="@p.Id" selected="@(p.Id==PromotorId)">@p.Nombre</option>}</select></label>
+ <button class="primary-action">Filtrar</button>
+</form>
+@if(Resumen is not null)
+{
+ <section class="metrics">
+  <article><span>Importe entregado</span><strong>@Resumen.TotalVentas.ToString("C",Moneda)</strong><small>@Resumen.VentasEntregadas pedidos entregados</small></article>
+  <article><span>Pedidos pendientes</span><strong>@Resumen.PedidosPendientes</strong><small>Recibidos, en producción o terminados</small></article>
+  <article><span>Pedidos del período</span><strong>@Resumen.PedidosPeriodo</strong><small>Todos los estados</small></article>
+ </section>
+ <section class="dashboard-grid">
+  <article class="data-card">
+   <h2>Pedidos entregados por promotor</h2><p class="hint">Indicador operativo. No determina por sí solo una venta cobrada ni una comisión pagadera.</p>
+   @if(Resumen.VentasPorPromotor.Count==0){<p>Sin pedidos entregados.</p>}
+   else
+   {
+    @foreach(var row in Resumen.VentasPorPromotor)
+    {<div class="ranking"><span>@row.PromotorNombre <small>@row.Cantidad pedidos</small></span><strong>@row.Total.ToString("C",Moneda)</strong></div>}
+   }
+  </article>
+  <article class="data-card">
+   <h2>Proformas recientes</h2>
+   @if(Resumen.ProformasRecientes.Count==0){<p>Sin proformas en el período.</p>}
+   else
+   {
+    @foreach(var q in Resumen.ProformasRecientes)
+    {<a class="recent" href="/proformas/@q.Id"><span>#@q.Numero · @q.ClienteNombre<small>@q.PromotorNombre · @q.FechaUtc.ToString("dd/MM/yyyy")</small></span><strong>@q.Total.ToString("C",Moneda)</strong></a>}
+   }
+  </article>
+ </section>
+}
+
+@code{
+ private static readonly System.Globalization.CultureInfo Moneda=new("es-BO");
+ [SupplyParameterFromQuery]public DateOnly? Desde{get;set;}
+ [SupplyParameterFromQuery]public DateOnly? Hasta{get;set;}
+ [SupplyParameterFromQuery]public Guid? ClienteId{get;set;}
+ [SupplyParameterFromQuery]public Guid? PromotorId{get;set;}
+ private DashboardResumen? Resumen;
+ private IReadOnlyList<ClienteResumen> Clientes=[];
+ private IReadOnlyList<PromotorResumen> Promotores=[];
+ protected override async Task OnParametersSetAsync(){Clientes=await ClienteService.ListarParaAdministradorAsync();Promotores=await PromotorService.ListarAsync();Resumen=await DashboardService.ObtenerAsync(new System.Security.Claims.ClaimsPrincipal(),true,Desde,Hasta,ClienteId,PromotorId);}
+}

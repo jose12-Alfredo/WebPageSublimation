@@ -1,0 +1,85 @@
+@page "/proformas/nueva"
+@attribute [Authorize(Roles = Roles.Promotor)]
+@inject ClienteService ServicioClientes
+@inject CatalogoService ServicioCatalogo
+
+<PageTitle>Nueva proforma | Simons Publicidad</PageTitle>
+<header class="page-heading">
+    <span>Área comercial / proformas</span>
+    <h1>Nueva proforma</h1>
+    <p>Selecciona un cliente de tu cartera. Los precios se toman del catálogo en el servidor y quedan congelados al guardar.</p>
+</header>
+
+@if (!string.IsNullOrWhiteSpace(Mensaje)) { <p class="feedback @Tipo" role="status">@Mensaje</p> }
+
+@if (Clientes.Count == 0 || Productos.Count == 0)
+{
+    <section class="empty-state">
+        <strong>Datos necesarios</strong>
+        <h2>No se puede crear una proforma todavía.</h2>
+        <p>@MensajeDatosFaltantes</p>
+    </section>
+}
+else
+{
+    <form class="proforma-form" method="post" action="/proformas/crear" data-proforma-form>
+        <AntiforgeryToken />
+        <section class="data-card proforma-head">
+            <span class="section-kicker">Datos comerciales</span>
+            <h2>Cliente</h2>
+            <label for="clienteId">Cliente asignado</label>
+            <select id="clienteId" name="clienteId" required>
+                <option value="">Selecciona un cliente</option>
+                @foreach (var cliente in Clientes) { <option value="@cliente.Id">@cliente.Nombre</option> }
+            </select>
+            <label for="observaciones">Observaciones</label>
+            <textarea id="observaciones" name="observaciones" maxlength="1500"></textarea>
+        </section>
+
+        <section class="data-card proforma-items">
+            <div class="list-heading"><div><span class="section-kicker">Detalle</span><h2>Productos</h2></div><button type="button" class="secondary-action" data-add-line>Agregar producto</button></div>
+            <div data-lines>
+                <div class="proforma-line" data-line>
+                    <label>Producto<select name="productoId" data-product-select required><option value="">Selecciona</option>@foreach (var producto in Productos) { <option value="@producto.Id">@producto.Nombre — @producto.PrecioComercial.ToString("C", Moneda)</option> }</select></label>
+                    <label>Variante<select name="varianteId" data-variant-select><option value="">Sin variante</option>@foreach(var producto in Productos){@foreach(var variante in producto.Variantes){<option value="@variante.Id" data-product-id="@producto.Id">@variante.Nombre</option>}}</select></label>
+                    <label>Cantidad<input name="cantidad" type="number" min="0.001" step="0.001" inputmode="decimal" required /></label>
+                    <button type="button" class="remove-line" data-remove-line aria-label="Quitar producto">×</button>
+                </div>
+            </div>
+            <p class="price-note">No se reciben precios desde el navegador. El total se calcula con el precio comercial vigente al guardar.</p>
+            <button class="primary-action">Crear proforma <span aria-hidden="true">→</span></button>
+        </section>
+    </form>
+
+    <template id="proforma-line-template">
+        <div class="proforma-line" data-line>
+            <label>Producto<select name="productoId" data-product-select required><option value="">Selecciona</option>@foreach (var producto in Productos) { <option value="@producto.Id">@producto.Nombre — @producto.PrecioComercial.ToString("C", Moneda)</option> }</select></label>
+            <label>Variante<select name="varianteId" data-variant-select><option value="">Sin variante</option>@foreach(var producto in Productos){@foreach(var variante in producto.Variantes){<option value="@variante.Id" data-product-id="@producto.Id">@variante.Nombre</option>}}</select></label>
+            <label>Cantidad<input name="cantidad" type="number" min="0.001" step="0.001" inputmode="decimal" required /></label>
+            <button type="button" class="remove-line" data-remove-line aria-label="Quitar producto">×</button>
+        </div>
+    </template>
+}
+
+@code {
+    private static readonly System.Globalization.CultureInfo Moneda = new("es-BO");
+    [CascadingParameter] private Task<AuthenticationState> AuthenticationStateTask { get; set; } = default!;
+    [SupplyParameterFromQuery(Name = "mensaje")] public string? Mensaje { get; set; }
+    [SupplyParameterFromQuery(Name = "tipo")] public string? Tipo { get; set; }
+    private IReadOnlyList<ClienteResumen> Clientes { get; set; } = [];
+    private IReadOnlyList<ProductoResumen> Productos { get; set; } = [];
+    private bool HayProductosConPrecioReferencial { get; set; }
+    private string MensajeDatosFaltantes => Clientes.Count == 0
+        ? "Necesitas al menos un cliente activo asignado a tu cuenta."
+        : HayProductosConPrecioReferencial
+            ? "Los productos activos tienen precios referenciales. El administrador debe confirmar al menos un precio comercial antes de crear proformas."
+            : "El catálogo necesita al menos un producto activo con precio comercial confirmado.";
+    protected override async Task OnInitializedAsync()
+    {
+        var state = await AuthenticationStateTask;
+        Clientes = await ServicioClientes.ListarParaPromotorAsync(state.User);
+        var productosActivos = await ServicioCatalogo.ListarProductosAsync(null, true);
+        HayProductosConPrecioReferencial = productosActivos.Any(x => x.PrecioEsReferencial);
+        Productos = productosActivos.Where(x => !x.PrecioEsReferencial).ToList();
+    }
+}

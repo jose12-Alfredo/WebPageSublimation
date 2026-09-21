@@ -1,0 +1,239 @@
+.public-shell {
+    min-width: 0;
+    min-height: 100vh;
+    min-height: 100dvh;
+    overflow-x: clip;
+    background: var(--simons-public-paper);
+    color: var(--simons-ink);
+}
+
+.skip-link {
+    padding: .8rem 1rem;
+    position: fixed;
+    top: max(.5rem, env(safe-area-inset-top));
+    left: max(.5rem, env(safe-area-inset-left));
+    z-index: 100;
+    background: var(--simons-lime);
+    color: var(--simons-ink);
+    font-weight: 850;
+    transform: translateY(-160%);
+    transition: transform .2s ease;
+}
+
+.skip-link:focus { transform: none; }
+
+.public-header {
+    width: 100%;
+    min-height: 5.75rem;
+    padding-inline: max(clamp(1rem, 5vw, 5rem), env(safe-area-inset-left));
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    border-bottom: 1px solid #30332f;
+    background: rgba(16, 18, 15, .97);
+}
+
+.public-header-inner {
+    width: min(100%, 112rem);
+    min-height: inherit;
+    margin-inline: auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: clamp(1rem, 3vw, 3rem);
+}
+
+.public-brand {
+    min-width: 0;
+    flex: 0 1 auto;
+    display: flex;
+    align-items: center;
+    color: #fff;
+    text-decoration: none;
+}
+
+.public-brand > img {
+    width: clamp(10rem, 17vw, 18.5rem);
+    max-width: 100%;
+    height: auto;
+    display: block;
+    object-fit: contain;
+}
+
+.public-nav-toggle,
+.public-nav-button { display: none; }
+
+.public-header nav {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: clamp(.5rem, 2vw, 2.2rem);
+}
+
+.public-header nav ::deep a {
+    min-width: 44px;
+    min-height: 44px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    color: #cdd2c9;
+    font-size: clamp(.78rem, .8vw, .9rem);
+    font-weight: 750;
+    line-height: 1.2;
+    white-space: nowrap;
+    text-decoration: none;
+    transition: color .2s ease;
+}
+
+.public-header nav ::deep a::after {
+    content: "";
+    height: 1px;
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: .4rem;
+    background: var(--simons-lime);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform .25s ease;
+}
+
+.public-header nav ::deep a.active { color: #fff; }
+.public-header nav ::deep a.active::after { transform: scaleX(1); }
+
+.public-header nav .access {
+    max-width: 12rem;
+    padding: .75rem clamp(.8rem, 1.4vw, 1.2rem);
+    justify-content: center;
+    overflow-wrap: anywhere;
+    white-space: normal;
+    text-align: center;
+    background: var(--simons-lime);
+    color: var(--simons-ink);
+}
+
+.public-header nav .access::after { display: none; }
+
+.public-footer {
+    padding: clamp(3rem, 6vw, 5rem) max(clamp(1rem, 5vw, 5rem), calc((100vw - 112rem) / 2));
+    display: flex;
+    justify-content: space-between;
+    gap: 3rem;
+    border-top: 1px solid #30332f;
+    background: var(--simons-ink);
+    color: #fff;
+}
+
+.footer-brand {
+    min-width: 0;
+    display: flex !important;
+    align-items: center;
+    gap: .8rem !important;
+}
+
+.footer-brand > img {
+    width: clamp(9rem, 16vw, 13rem);
+    max-width: 100%;
+    height: auto;
+    display: block;
+    object-fit: contain;
+}
+
+.public-footer div { display: grid; gap: .35rem; }
+.public-footer div span { color: #b5bbaf; font-size: .8rem; }
+
+.public-footer a {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    gap: .8rem;
+    color: var(--simons-lime);
+    font-weight: 800;
+    text-decoration: none;
+}
+
+.public-footer a span { transition: transform .2s ease; }
+#blazor-error-ui { display: none; }
+
+@media (hover: hover) and (pointer: fine) {
+    .public-header nav ::deep a:hover { color: #fff; }
+    .public-header nav ::deep a:hover::after { transform: scaleX(1); }
+    .public-header nav .access:hover { background: var(--simons-lime-soft); color: var(--simons-ink); }
+    .public-footer a:hover span { transform: translateX(.25rem); }
+}
+
+@media (max-width: 1020px) {
+    .public-header { min-height: 4.75rem; }
+    .public-brand > img { width: clamp(8.75rem, 24vw, 11.5rem); }
+
+    .public-nav-toggle {
+        width: 3rem;
+        height: 3rem;
+        display: block;
+        position: absolute;
+        right: max(clamp(1rem, 5vw, 5rem), env(safe-area-inset-right));
+        z-index: 2;
+        opacity: 0;
+        cursor: pointer;
+    }
+
+    .public-nav-button {
+        width: 3rem;
+        height: 3rem;
+        margin: 0;
+        padding: 0;
+        display: grid;
+        place-content: center;
+        gap: .28rem;
+        position: relative;
+        border: 1px solid #4a4e47;
+        color: #fff;
+        cursor: pointer;
+    }
+
+    .public-nav-button i { width: 1.25rem; height: 2px; display: block; background: #fff; transition: transform .2s ease, opacity .2s ease; }
+    .public-nav-toggle:checked + .public-nav-button i:first-child { transform: translateY(6px) rotate(45deg); }
+    .public-nav-toggle:checked + .public-nav-button i:nth-child(2) { opacity: 0; }
+    .public-nav-toggle:checked + .public-nav-button i:last-child { transform: translateY(-6px) rotate(-45deg); }
+
+    .public-header nav {
+        width: 100%;
+        max-height: calc(100dvh - 4.75rem);
+        padding: 1rem max(1rem, env(safe-area-inset-right)) max(1.5rem, env(safe-area-inset-bottom)) max(1rem, env(safe-area-inset-left));
+        display: grid;
+        align-items: stretch;
+        gap: .25rem;
+        overflow-y: auto;
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 100%;
+        border-top: 1px solid #30332f;
+        background: var(--simons-ink);
+        box-shadow: 0 22px 38px rgba(0, 0, 0, .28);
+    }
+
+    .public-header nav { display: none; }
+    .public-nav-toggle:checked ~ nav { display: grid; }
+    .public-header nav ::deep a { padding: .75rem; font-size: 1rem; white-space: normal; }
+    .public-header nav ::deep a::after { left: .75rem; right: auto; width: 2.5rem; }
+    .public-header nav .access { width: 100%; max-width: none; margin-top: .4rem; padding: .85rem 1rem; }
+}
+
+@media (max-width: 600px) {
+    .public-footer { flex-direction: column; gap: 2rem; }
+    .footer-brand { align-items: flex-start; flex-direction: column; }
+}
+
+@media (max-width: 350px) {
+    .public-header { padding-inline: .75rem; }
+    .public-brand > img { width: 8.4rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .skip-link,
+    .public-header nav ::deep a,
+    .public-header nav ::deep a::after,
+    .public-nav-button i,
+    .public-footer a span { transition: none; }
+}

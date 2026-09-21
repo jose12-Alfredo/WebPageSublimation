@@ -1,0 +1,22 @@
+.nav-heading { min-height: 5.25rem; padding: 1rem 1.25rem; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #30332d; }
+.brand { display: flex; align-items: center; gap: .65rem; color: #fff; font-weight: 900; letter-spacing: .08em; text-decoration: none; }
+.brand-mark { width: 2.5rem; height: 2.5rem; display: block; object-fit: cover; }
+.brand-copy small { display: block; color: #92978d; font-size: .53rem; letter-spacing: .23em; }
+.nav-toggle-input { display: none; }
+.nav-heading:has(~ .nav-toggle-input:focus-visible) .nav-toggle { outline: 3px solid #b6ff27; outline-offset: 3px; }
+@media (max-width: 760px) {
+    .nav-toggle-input { display: block; position: absolute; right: 1.25rem; top: .875rem; width: 2.75rem; height: 2.75rem; opacity: 0; cursor: pointer; z-index: 1; }
+}
+.nav-toggle { display: none; width: 2.75rem; height: 2.75rem; cursor: pointer; place-content: center; gap: .28rem; border: 1px solid #3c4038; }
+.nav-toggle span { width: 1.2rem; height: 2px; display: block; background: #b6ff27; }
+.nav-scrollable { min-height: calc(100vh - 5.25rem); padding: 1.4rem 1rem; display: flex; flex-direction: column; justify-content: space-between; position: sticky; top: 0; }
+.nav-links { display: grid; gap: .3rem; }
+.nav-section { margin: 1.4rem .75rem .35rem; color: #73786e; font-size: .62rem; font-weight: 800; letter-spacing: .17em; text-transform: uppercase; }
+::deep .nav-link { min-height: 2.9rem; padding: .8rem .85rem; border-left: 3px solid transparent; color: #c5c9c0; font-size: .88rem; font-weight: 650; text-decoration: none; }
+::deep .nav-link:hover { color: #fff; background: #1b1e19; }
+::deep .nav-link.active { border-left-color: #b6ff27; background: #22261f; color: #fff; }
+.logout-form { margin-top: 2rem; border-top: 1px solid #30332d; padding-top: 1rem; }
+.logout-form button { width: 100%; padding: .8rem; display: flex; justify-content: space-between; border: 0; background: transparent; color: #c5c9c0; font-weight: 700; text-align: left; }
+.logout-form button:hover { color: #fff; background: #1b1e19; }
+.logout-form span { color: #b6ff27; }
+@media (max-width: 760px) { .nav-heading { min-height: 4.5rem; } .nav-toggle { display: grid; } .nav-scrollable { min-height: auto; display: none; position: static; } .nav-toggle-input:checked + .nav-scrollable { display: flex; } }

@@ -1,0 +1,26 @@
+services:
+  - type: web
+    name: simons-gestion-comercial
+    runtime: docker
+    plan: free
+    region: ohio
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /health
+    autoDeployTrigger: commit
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: Deployment__BehindProxy
+        value: "true"
+      - key: Deployment__SecureCookies
+        value: "true"
+      - key: Deployment__DataProtectionKeysPath
+        value: /keys
+      - key: DemoUsers__Enabled
+        value: "false"
+      - key: ConnectionStrings__DefaultConnection
+        sync: false
+      - key: InitialAdmin__Email
+        sync: false
+      - key: InitialAdmin__Password
+        sync: false

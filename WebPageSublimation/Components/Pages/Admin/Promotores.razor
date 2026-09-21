@@ -1,0 +1,91 @@
+@page "/admin/promotores"
+@attribute [Authorize(Roles = Roles.Administrador)]
+@inject PromotorService ServicioPromotores
+
+<PageTitle>Promotores | Simons Publicidad</PageTitle>
+
+<header class="page-heading">
+    <span>Administración / equipo comercial</span>
+    <h1>Promotores</h1>
+    <p>Cada promotor opera con una cuenta propia. Desactivar una cuenta bloquea nuevas operaciones sin borrar su historial.</p>
+</header>
+
+@if (!string.IsNullOrWhiteSpace(Mensaje))
+{
+    <p class="feedback @Tipo" role="status">@Mensaje</p>
+}
+
+<section class="promotores-layout">
+    <form class="data-card promotor-form" method="post" action="/admin/promotores/crear">
+        <AntiforgeryToken />
+        <span class="section-kicker">Nueva cuenta</span>
+        <h2>Agregar promotor</h2>
+        <p>La contraseña debe cumplir las reglas de seguridad de la cuenta.</p>
+
+        <label for="nombre">Nombre completo</label>
+        <input id="nombre" name="nombre" autocomplete="name" maxlength="160" required />
+
+        <label for="email">Correo de acceso</label>
+        <input id="email" name="email" type="email" autocomplete="email" required />
+
+        <label for="password">Contraseña inicial</label>
+        <input id="password" name="password" type="password" autocomplete="new-password" required />
+
+        <button type="submit" class="primary-action">Crear cuenta <span aria-hidden="true">→</span></button>
+    </form>
+
+    <section class="promotores-list" aria-labelledby="lista-promotores">
+        <div class="list-heading">
+            <div>
+                <span class="section-kicker">Equipo</span>
+                <h2 id="lista-promotores">Cuentas comerciales</h2>
+            </div>
+            <span class="count">@Listado.Count</span>
+        </div>
+
+        @if (Listado.Count == 0)
+        {
+            <div class="empty-list">
+                <strong>Aún no hay promotores.</strong>
+                <p>Crea la primera cuenta para habilitar el trabajo comercial.</p>
+            </div>
+        }
+        else
+        {
+            <div class="promotor-cards">
+                @foreach (var promotor in Listado)
+                {
+                    <article class="promotor-card">
+                        <div>
+                            <span class="status @(promotor.IsActive ? "active" : "inactive")">@(promotor.IsActive ? "Activo" : "Desactivado")</span>
+                            <h3>@promotor.Nombre</h3>
+                            <p>@promotor.Email</p>
+                        </div>
+                        @if (promotor.IsActive)
+                        {
+                            <form method="post" action="/admin/promotores/@promotor.Id/desactivar">
+                                <AntiforgeryToken />
+                                <button type="submit" class="secondary-action">Desactivar</button>
+                            </form>
+                        }
+                    </article>
+                }
+            </div>
+        }
+    </section>
+</section>
+
+@code {
+    [SupplyParameterFromQuery(Name = "mensaje")]
+    public string? Mensaje { get; set; }
+
+    [SupplyParameterFromQuery(Name = "tipo")]
+    public string? Tipo { get; set; }
+
+    private IReadOnlyList<PromotorResumen> Listado { get; set; } = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        Listado = await ServicioPromotores.ListarAsync();
+    }
+}

@@ -1,0 +1,15 @@
+@page "/admin/proformas"
+@attribute [Authorize(Roles = Roles.Administrador)]
+@inject ProformaService ServicioProformas
+
+<PageTitle>Proformas | Simons Publicidad</PageTitle>
+<header class="page-heading"><span>Administración / operaciones</span><h1>Proformas</h1><p>Consulta todas las proformas e identifica al promotor responsable.</p></header>
+<section class="admin-proformas">
+    @if (Listado.Count == 0) { <div class="empty-list"><strong>Aún no hay proformas.</strong><p>Las propuestas creadas por promotores aparecerán aquí.</p></div> }
+    else { @foreach (var item in Listado) { <a href="@($"/proformas/{item.Id}")"><div><span>#@item.Numero · @item.FechaUtc.ToString("dd/MM/yyyy")</span><h2>@item.ClienteNombre</h2><p>Promotor: @item.PromotorNombre</p></div><strong>@item.Total.ToString("C", Moneda)</strong></a> } }
+</section>
+@code {
+    private static readonly System.Globalization.CultureInfo Moneda = new("es-BO");
+    private IReadOnlyList<ProformaResumen> Listado { get; set; } = [];
+    protected override async Task OnInitializedAsync() => Listado = await ServicioProformas.ListarParaAdministradorAsync();
+}

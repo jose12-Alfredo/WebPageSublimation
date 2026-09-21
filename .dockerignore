@@ -1,0 +1,17 @@
+**/bin
+**/obj
+.git
+.idea
+.vs
+tests
+**/*.user
+.vs
+.agents
+.codex
+.impeccable
+artifacts
+output
+tmp
+.env
+.env.*
+**/appsettings.Production.json

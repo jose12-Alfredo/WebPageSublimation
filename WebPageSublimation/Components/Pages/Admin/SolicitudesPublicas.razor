@@ -1,0 +1,7 @@
+@page "/admin/solicitudes"
+@attribute [Authorize(Roles = Roles.Administrador)]
+@inject SolicitudPublicaService ServicioSolicitudes
+<PageTitle>Solicitudes públicas | Simons Publicidad</PageTitle>
+<header class="page-heading"><span>Administración / contacto público</span><h1>Solicitudes</h1><p>Mensajes enviados desde la página pública. Una solicitud todavía no es una proforma, pedido ni pago.</p></header>
+<section class="request-list">@if(Listado.Count==0){<div class="empty-list"><strong>No hay solicitudes públicas.</strong><p>Los formularios recibidos aparecerán aquí.</p></div>}else{@foreach(var item in Listado){<article><div class="request-meta"><span>@item.CreatedAtUtc.ToString("dd/MM/yyyy HH:mm 'UTC'")</span><h2>@item.Nombre</h2>@if(!string.IsNullOrWhiteSpace(item.Empresa)){<p>@item.Empresa</p>}</div><div class="request-contact">@if(!string.IsNullOrWhiteSpace(item.Telefono)){<a href="tel:@item.Telefono">@item.Telefono</a>}@if(!string.IsNullOrWhiteSpace(item.Email)){<a href="mailto:@item.Email">@item.Email</a>}</div><p class="request-detail">@item.Detalle</p></article>}}</section>
+@code { private IReadOnlyList<SolicitudPublicaResumen> Listado=[]; protected override async Task OnInitializedAsync()=>Listado=await ServicioSolicitudes.ListarAsync(); }

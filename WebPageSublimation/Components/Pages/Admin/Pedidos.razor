@@ -1,0 +1,115 @@
+@page "/admin/pedidos"
+@attribute [Authorize(Roles = Roles.Administrador)]
+@inject PedidoService PedidoService
+
+<PageTitle>Pedidos | Simons Publicidad</PageTitle>
+
+<header class="page-heading">
+    <span>Administración / operaciones</span>
+    <h1>Pedidos</h1>
+    <p>Los pedidos de proformas entran al cálculo de comisión cuando se marcan como completados.</p>
+</header>
+
+<aside class="workflow-help">
+    <strong>¿Cómo completar un pedido?</strong>
+    <p>Busca un pedido identificado como <b>Desde proforma</b> y pulsa <b>Marcar completado</b>. Internamente quedará con estado Entregado y aparecerá en Comisiones.</p>
+</aside>
+
+@if (!string.IsNullOrWhiteSpace(Mensaje))
+{
+    <p class="feedback @Tipo" role="status">@Mensaje</p>
+}
+
+<section class="records">
+    @if (Listado.Count == 0)
+    {
+        <div class="empty-list"><strong>Aún no hay pedidos.</strong></div>
+    }
+    else
+    {
+        @foreach (var item in Listado)
+        {
+            <article class="order-card">
+                <a class="order-summary" href="/pedidos/@item.Id">
+                    <div class="order-meta">
+                        <span>Pedido #@item.Numero · @item.FechaUtc.ToString("dd/MM/yyyy")</span>
+                        @if (item.ProformaId is not null)
+                        {
+                            <em>Desde proforma</em>
+                        }
+                        else
+                        {
+                            <em class="direct">Pedido directo</em>
+                        }
+                    </div>
+                    <h2>@item.ClienteNombre</h2>
+                    <p>@item.PromotorNombre · @item.Total.ToString("C", Moneda)</p>
+                    <strong class="status @StatusClass(item.Estado)">@Format(item.Estado)</strong>
+                </a>
+
+                <div class="order-actions">
+                    <form class="state-form" method="post" action="/admin/pedidos/@item.Id/estado">
+                        <AntiforgeryToken />
+                        <label>
+                            Cambiar estado
+                            <select name="estado">
+                                @foreach (var state in Enum.GetValues<EstadoPedido>())
+                                {
+                                    <option value="@state" selected="@(state == item.Estado)">@Format(state)</option>
+                                }
+                            </select>
+                        </label>
+                        <button class="secondary-action">Actualizar</button>
+                    </form>
+
+                    @if (item.ProformaId is not null && item.Estado is not EstadoPedido.Entregado and not EstadoPedido.Cancelado)
+                    {
+                        <form method="post" action="/admin/pedidos/@item.Id/estado">
+                            <AntiforgeryToken />
+                            <input type="hidden" name="estado" value="@EstadoPedido.Entregado" />
+                            <button class="complete-action">Marcar completado <span aria-hidden="true">✓</span></button>
+                        </form>
+                    }
+                    else if (item.ProformaId is null)
+                    {
+                        <small>Este pedido no proviene de una proforma y no genera comisión.</small>
+                    }
+                    else if (item.Estado == EstadoPedido.Entregado)
+                    {
+                        <small class="eligible-note">Incluido en el cálculo de comisiones.</small>
+                    }
+                </div>
+            </article>
+        }
+    }
+</section>
+
+@code {
+    private static readonly System.Globalization.CultureInfo Moneda = new("es-BO");
+
+    [SupplyParameterFromQuery(Name = "mensaje")] public string? Mensaje { get; set; }
+    [SupplyParameterFromQuery(Name = "tipo")] public string? Tipo { get; set; }
+
+    private IReadOnlyList<PedidoResumen> Listado = [];
+
+    protected override async Task OnInitializedAsync() =>
+        Listado = await PedidoService.ListarAsync(new System.Security.Claims.ClaimsPrincipal(), true);
+
+    private static string Format(EstadoPedido value) => value switch
+    {
+        EstadoPedido.Recibido => "Recibido",
+        EstadoPedido.EnProduccion => "En producción",
+        EstadoPedido.Terminado => "Listo para entregar",
+        EstadoPedido.Entregado => "Completado / entregado",
+        EstadoPedido.Cancelado => "Cancelado",
+        _ => value.ToString()
+    };
+
+    private static string StatusClass(EstadoPedido value) => value switch
+    {
+        EstadoPedido.Entregado => "completed",
+        EstadoPedido.Cancelado => "cancelled",
+        EstadoPedido.Terminado => "ready",
+        _ => "active"
+    };
+}
