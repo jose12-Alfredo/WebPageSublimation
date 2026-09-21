@@ -74,6 +74,67 @@
     letter-spacing: -.04em;
 }
 
+.demo-access {
+    margin: 0 0 1.5rem;
+    padding: 1rem;
+    background: #eef0e9;
+    color: #10120f;
+}
+
+.demo-access h3 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 850;
+}
+
+.demo-access > p {
+    margin: .35rem 0 1rem;
+    color: #4f564b;
+    font-size: .85rem;
+    line-height: 1.45;
+}
+
+.demo-access dl {
+    display: grid;
+    gap: .65rem;
+    margin: 0;
+}
+
+.demo-access dl div {
+    display: grid;
+    gap: .12rem;
+}
+
+.demo-access dt {
+    color: #4f564b;
+    font-size: .7rem;
+    font-weight: 800;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+}
+
+.demo-access dd {
+    margin: 0;
+    overflow-wrap: anywhere;
+    font-size: .88rem;
+    font-weight: 700;
+}
+
+.demo-access code {
+    padding: .14rem .35rem;
+    background: #d9ff57;
+    color: #10120f;
+    font: inherit;
+}
+
+.demo-access small {
+    display: block;
+    margin-top: 1rem;
+    color: #4f564b;
+    font-size: .72rem;
+    line-height: 1.4;
+}
+
 .login-form label {
     margin-bottom: .45rem;
     font-size: .82rem;

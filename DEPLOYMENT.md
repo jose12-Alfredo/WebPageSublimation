@@ -16,10 +16,11 @@ Para una demostración sobre una base PostgreSQL vacía, el arranque aplica prim
 
 - `DemoUsers__Enabled=true`
 - `DemoData__Enabled=true`
+- `DemoAccess__ShowCredentials=true` para mostrar en el login la cuenta del promotor demo y facilitar la presentación.
 - `DemoUsers__PromoterEmail`, `DemoUsers__PromoterPassword` y `DemoUsers__PromoterName`
 - `DemoUsers__ClientEmail` y `DemoUsers__ClientName`
 
-La carga incluye las cuatro referencias de catálogo y sus seis fotografías aprobadas que ya están en el repositorio, un promotor, un cliente, una proforma y dos pedidos sintéticos. No copia usuarios, contraseñas, contactos, pedidos ni proformas reales de otra base. En producción mantenga ambas opciones en `false`.
+La carga incluye las cuatro referencias de catálogo y sus seis fotografías aprobadas que ya están en el repositorio, un promotor, un cliente, una proforma y dos pedidos sintéticos. No copia usuarios, contraseñas, contactos, pedidos ni proformas reales de otra base. La pantalla de acceso nunca revela la contraseña administrativa. En producción mantenga las tres opciones en `false`.
 
 La configuración de Render deshabilita la creación automática de usuarios demo. Las cuentas que ya existan en Neon permanecen en la base, por lo que sus contraseñas deben rotarse antes de hacer pública la dirección.
 

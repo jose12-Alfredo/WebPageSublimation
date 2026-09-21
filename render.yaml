@@ -20,6 +20,8 @@ services:
         value: "false"
       - key: DemoData__Enabled
         value: "false"
+      - key: DemoAccess__ShowCredentials
+        value: "false"
       - key: ConnectionStrings__DefaultConnection
         sync: false
       - key: InitialAdmin__Email

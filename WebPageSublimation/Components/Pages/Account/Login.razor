@@ -1,5 +1,7 @@
 @page "/cuenta/ingresar"
 @layout AuthLayout
+@inject IConfiguration Configuration
+@using WebPageSublimation.Features.Auth
 
 <PageTitle>Ingresar | Simons Publicidad</PageTitle>
 
@@ -21,6 +23,32 @@
             <span>SIMONS / SISTEMA</span>
             <h2>Iniciar sesión</h2>
         </div>
+
+        @if (DemoCredentials is not null)
+        {
+            <section class="demo-access" aria-labelledby="demo-access-title">
+                <h3 id="demo-access-title">Acceso de demostración</h3>
+                <p>Usa esta cuenta para recorrer el espacio comercial.</p>
+                <dl>
+                    <div>
+                        <dt>Promotor</dt>
+                        <dd>@DemoCredentials.PromoterEmail</dd>
+                    </div>
+                    <div>
+                        <dt>Contraseña</dt>
+                        <dd><code>@DemoCredentials.PromoterPassword</code></dd>
+                    </div>
+                    @if (!string.IsNullOrWhiteSpace(DemoCredentials.AdministratorEmail))
+                    {
+                        <div>
+                            <dt>Administrador</dt>
+                            <dd>@DemoCredentials.AdministratorEmail</dd>
+                        </div>
+                    }
+                </dl>
+                <small>La contraseña de administrador no se muestra.</small>
+            </section>
+        }
 
         @if (!string.IsNullOrWhiteSpace(Error))
         {
@@ -46,4 +74,8 @@
 
     [SupplyParameterFromQuery(Name = "returnUrl")]
     public string? ReturnUrl { get; set; }
+
+    private DemoLoginCredentials? DemoCredentials { get; set; }
+
+    protected override void OnInitialized() => DemoCredentials = DemoLoginCredentials.From(Configuration);
 }

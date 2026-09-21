@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using WebPageSublimation.Data;
+using WebPageSublimation.Features.Auth;
 using Xunit;
 
 namespace WebPageSublimation.Tests;
@@ -37,6 +38,32 @@ public class DemoUserConfigurationTests
         Assert.False(options.RequireLowercase);
         Assert.False(options.RequireUppercase);
         Assert.False(options.RequireNonAlphanumeric);
+    }
+
+    [Fact]
+    public void Las_credenciales_visibles_exigen_habilitacion_explicita()
+    {
+        var hidden = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
+        {
+            ["DemoUsers:Enabled"] = "true",
+            ["DemoUsers:PromoterEmail"] = "promotor.demo@simons.test",
+            ["DemoUsers:PromoterPassword"] = "Demo!2026"
+        }).Build();
+        Assert.Null(DemoLoginCredentials.From(hidden));
+
+        var visible = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
+        {
+            ["DemoUsers:Enabled"] = "true",
+            ["DemoAccess:ShowCredentials"] = "true",
+            ["DemoUsers:PromoterEmail"] = "promotor.demo@simons.test",
+            ["DemoUsers:PromoterPassword"] = "Demo!2026",
+            ["InitialAdmin:Email"] = "admin.demo@simons.test"
+        }).Build();
+        var credentials = DemoLoginCredentials.From(visible);
+
+        Assert.NotNull(credentials);
+        Assert.Equal("promotor.demo@simons.test", credentials.PromoterEmail);
+        Assert.Equal("admin.demo@simons.test", credentials.AdministratorEmail);
     }
 
     private static ServiceProvider CrearProveedor(Dictionary<string, string?> values)
