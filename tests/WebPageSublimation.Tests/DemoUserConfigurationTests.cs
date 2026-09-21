@@ -41,7 +41,7 @@ public class DemoUserConfigurationTests
     }
 
     [Fact]
-    public void Las_credenciales_visibles_exigen_habilitacion_explicita()
+    public void Las_credenciales_demo_siempre_estan_disponibles_en_el_login()
     {
         var hidden = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
         {
@@ -49,7 +49,9 @@ public class DemoUserConfigurationTests
             ["DemoUsers:PromoterEmail"] = "promotor.demo@simons.test",
             ["DemoUsers:PromoterPassword"] = "Demo!2026"
         }).Build();
-        Assert.Null(DemoLoginCredentials.From(hidden));
+        var defaults = DemoLoginCredentials.From(hidden);
+        Assert.NotNull(defaults);
+        Assert.Equal(DemoUserDefaults.PromoterEmail, defaults.PromoterEmail);
 
         var visible = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
         {
@@ -63,9 +65,9 @@ public class DemoUserConfigurationTests
         var credentials = DemoLoginCredentials.From(visible);
 
         Assert.NotNull(credentials);
-        Assert.Equal("promotor.demo@simons.test", credentials.PromoterEmail);
-        Assert.Equal("admin.demo@simons.test", credentials.AdministratorEmail);
-        Assert.Equal("Admin!2026", credentials.AdministratorPassword);
+        Assert.Equal(DemoUserDefaults.PromoterEmail, credentials.PromoterEmail);
+        Assert.Equal(DemoUserDefaults.AdministratorEmail, credentials.AdministratorEmail);
+        Assert.Equal(DemoUserDefaults.AdministratorPassword, credentials.AdministratorPassword);
     }
 
     private static ServiceProvider CrearProveedor(Dictionary<string, string?> values)

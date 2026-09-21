@@ -19,21 +19,21 @@ services:
       - key: DemoUsers__Enabled
         value: "true"
       - key: DemoData__Enabled
-        sync: false
+        value: "true"
       - key: DemoAccess__ShowCredentials
         value: "true"
       - key: DemoUsers__PromoterEmail
-        sync: false
+        value: demo.promotor@simons.test
       - key: DemoUsers__PromoterPassword
-        sync: false
+        value: DemoPromotor!2026
       - key: DemoUsers__PromoterName
-        sync: false
+        value: Promotor de demostración
       - key: DemoUsers__ClientEmail
-        sync: false
+        value: cliente.demo@simons.test
       - key: DemoUsers__ClientName
-        sync: false
+        value: Cliente de demostración
       - key: DemoUsers__AllowSimplePassword
-        sync: false
+        value: "false"
       - key: ConnectionStrings__DefaultConnection
         sync: false
       - key: InitialAdmin__Email
