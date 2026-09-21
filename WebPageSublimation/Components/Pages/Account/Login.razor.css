@@ -58,7 +58,7 @@
 }
 
 .login-form {
-    padding: clamp(2rem, 6vw, 4.5rem);
+    padding: clamp(2rem, 4vw, 3rem) clamp(2rem, 6vw, 4.5rem);
     align-self: stretch;
     display: flex;
     flex-direction: column;
@@ -68,46 +68,53 @@
 }
 
 .form-heading h2 {
-    margin: .35rem 0 2rem;
+    margin: .35rem 0 1.25rem;
     font-size: clamp(1.8rem, 4vw, 2.5rem);
     font-weight: 850;
     letter-spacing: -.04em;
 }
 
 .demo-access {
-    margin: 0 0 1.5rem;
-    padding: 1rem;
+    margin: 0 0 1.25rem;
+    padding: .75rem;
     background: #eef0e9;
     color: #10120f;
 }
 
+.demo-access-heading {
+    margin-bottom: .55rem;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: .15rem .75rem;
+}
+
 .demo-access h3 {
     margin: 0;
-    font-size: 1rem;
+    font-size: .9rem;
     font-weight: 850;
 }
 
-.demo-access > p {
-    margin: .35rem 0 1rem;
+.demo-access-heading p {
+    margin: 0;
     color: #4f564b;
-    font-size: .85rem;
-    line-height: 1.45;
+    font-size: .75rem;
 }
 
 .demo-accounts {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
-    gap: .6rem;
+    gap: .45rem;
 }
 
 .login-form .demo-account {
     min-height: 0;
     margin: 0;
-    padding: .8rem .9rem;
+    padding: .5rem .75rem;
     display: grid;
-    gap: .3rem;
-    justify-items: start;
-    align-content: start;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: .15rem .75rem;
+    align-items: center;
     border: 1px solid #cfd2ca;
     background: #fff;
     color: #10120f;
@@ -146,6 +153,8 @@
 }
 
 .login-form .demo-account .demo-email {
+    grid-column: 1 / -1;
+    grid-row: 2;
     overflow-wrap: anywhere;
     font-size: .88rem;
     font-weight: 700;
@@ -159,24 +168,16 @@
     font-weight: 700;
 }
 
-.demo-access small {
-    display: block;
-    margin-top: 1rem;
-    color: #4f564b;
-    font-size: .72rem;
-    line-height: 1.4;
-}
-
 .login-form label {
-    margin-bottom: .45rem;
+    margin-bottom: .4rem;
     font-size: .82rem;
     font-weight: 750;
 }
 
 .login-form input {
     width: 100%;
-    min-height: 3.25rem;
-    margin-bottom: 1.25rem;
+    min-height: 3rem;
+    margin-bottom: 1rem;
     padding: .75rem 1rem;
     border: 1px solid #cfd2ca;
     border-radius: 0;

@@ -45,46 +45,34 @@ public class DemoUserConfigurationTests
     {
         var hidden = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
         {
-            ["DemoUsers:Enabled"] = "true",
-            ["DemoUsers:PromoterEmail"] = "promotor.demo@simons.test",
-            ["DemoUsers:PromoterPassword"] = "Demo!2026"
+            ["DemoUsers:Enabled"] = "true"
         }).Build();
         Assert.Null(DemoLoginCredentials.From(hidden));
 
         var visible = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
         {
-            ["DemoUsers:Enabled"] = "true",
-            ["DemoAccess:ShowCredentials"] = "true",
-            ["DemoUsers:PromoterEmail"] = "promotor.demo@simons.test",
-            ["DemoUsers:PromoterPassword"] = "Demo!2026",
-            ["InitialAdmin:Email"] = "admin.demo@simons.test",
-            ["InitialAdmin:Password"] = "Admin!2026"
+            ["DemoAccess:ShowCredentials"] = "true"
         }).Build();
-        var credentials = DemoLoginCredentials.From(visible);
-
-        Assert.NotNull(credentials);
-        Assert.Equal("promotor.demo@simons.test", credentials.PromoterEmail);
-        Assert.Equal("admin.demo@simons.test", credentials.AdministratorEmail);
-        Assert.Equal("Admin!2026", credentials.AdministratorPassword);
-        Assert.True(credentials.HasAdministrator);
+        Assert.NotNull(DemoLoginCredentials.From(visible));
     }
 
     [Fact]
-    public void La_cuenta_administrador_solo_se_ofrece_con_correo_y_contrasena()
+    public void El_login_muestra_las_cuentas_sembradas_y_nunca_el_administrador_inicial()
     {
         var configuration = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
         {
-            ["DemoUsers:Enabled"] = "true",
             ["DemoAccess:ShowCredentials"] = "true",
-            ["DemoUsers:PromoterEmail"] = "promotor.demo@simons.test",
-            ["DemoUsers:PromoterPassword"] = "Demo!2026",
-            ["InitialAdmin:Email"] = "admin.demo@simons.test"
+            ["InitialAdmin:Email"] = "admin.real@simons.test",
+            ["InitialAdmin:Password"] = "Secreta!Real2026"
         }).Build();
 
         var credentials = DemoLoginCredentials.From(configuration);
 
         Assert.NotNull(credentials);
-        Assert.False(credentials.HasAdministrator);
+        Assert.Equal(DemoUserDefaults.AdministratorEmail, credentials.AdministratorEmail);
+        Assert.Equal(DemoUserDefaults.AdministratorPassword, credentials.AdministratorPassword);
+        Assert.Equal(DemoUserDefaults.PromoterEmail, credentials.PromoterEmail);
+        Assert.Equal(DemoUserDefaults.PromoterPassword, credentials.PromoterPassword);
     }
 
     private static ServiceProvider CrearProveedor(Dictionary<string, string?> values)
