@@ -75,87 +75,96 @@ public static class DatabaseInitializer
 
         var demoDataEnabled = app.Configuration.GetValue<bool>("DemoData:Enabled");
 
-        await EnsureDemoUserAsync(
-            userManager,
-            DemoUserDefaults.AdministratorEmail,
-            DemoUserDefaults.AdministratorPassword,
-            Roles.Administrador);
-
-        var promoterEmail = DemoUserDefaults.PromoterEmail;
-        var previousPromoterEmail = app.Configuration["DemoUsers:PreviousPromoterEmail"]?
-            .Trim().ToLowerInvariant();
-        var promoterPassword = DemoUserDefaults.PromoterPassword;
-        var promoterName = DemoUserDefaults.PromoterName;
-
-        var promoterUser = await userManager.FindByEmailAsync(promoterEmail);
-        if (promoterUser is null && !string.IsNullOrWhiteSpace(previousPromoterEmail))
-            promoterUser = await userManager.FindByEmailAsync(previousPromoterEmail);
-        if (promoterUser is null)
+        try
         {
-            promoterUser = new ApplicationUser
+            await EnsureDemoUserAsync(
+                userManager,
+                DemoUserDefaults.AdministratorEmail,
+                DemoUserDefaults.AdministratorPassword,
+                Roles.Administrador);
+
+            var promoterEmail = DemoUserDefaults.PromoterEmail;
+            var previousPromoterEmail = app.Configuration["DemoUsers:PreviousPromoterEmail"]?
+                .Trim().ToLowerInvariant();
+            var promoterPassword = DemoUserDefaults.PromoterPassword;
+            var promoterName = DemoUserDefaults.PromoterName;
+
+            var promoterUser = await userManager.FindByEmailAsync(promoterEmail);
+            if (promoterUser is null && !string.IsNullOrWhiteSpace(previousPromoterEmail))
+                promoterUser = await userManager.FindByEmailAsync(previousPromoterEmail);
+            if (promoterUser is null)
             {
-                UserName = promoterEmail,
-                Email = promoterEmail,
-                EmailConfirmed = true,
-                IsActive = true
-            };
-            EnsureSucceeded(await userManager.CreateAsync(promoterUser, promoterPassword),
-                "crear el usuario promotor demo");
-        }
-        else if (!string.Equals(promoterUser.Email, promoterEmail, StringComparison.Ordinal) ||
-                 !string.Equals(promoterUser.UserName, promoterEmail, StringComparison.Ordinal))
-        {
-            promoterUser.Email = promoterEmail;
-            promoterUser.UserName = promoterEmail;
-            EnsureSucceeded(await userManager.UpdateAsync(promoterUser),
-                "normalizar el correo del promotor demo");
-        }
-
-        if (!await userManager.IsInRoleAsync(promoterUser, Roles.Promotor))
-            EnsureSucceeded(await userManager.AddToRoleAsync(promoterUser, Roles.Promotor),
-                "asignar el rol Promotor al usuario demo");
-
-        if (!await db.Promotores.AnyAsync(x => x.UserId == promoterUser.Id))
-        {
-            db.Promotores.Add(new Promotor
+                promoterUser = new ApplicationUser
+                {
+                    UserName = promoterEmail,
+                    Email = promoterEmail,
+                    EmailConfirmed = true,
+                    IsActive = true
+                };
+                EnsureSucceeded(await userManager.CreateAsync(promoterUser, promoterPassword),
+                    "crear el usuario promotor demo");
+            }
+            else if (!string.Equals(promoterUser.Email, promoterEmail, StringComparison.Ordinal) ||
+                     !string.Equals(promoterUser.UserName, promoterEmail, StringComparison.Ordinal))
             {
-                UserId = promoterUser.Id,
-                Nombre = promoterName
-            });
-            await db.SaveChangesAsync();
-        }
+                promoterUser.Email = promoterEmail;
+                promoterUser.UserName = promoterEmail;
+                EnsureSucceeded(await userManager.UpdateAsync(promoterUser),
+                    "normalizar el correo del promotor demo");
+            }
 
-        var clientEmail = DemoUserDefaults.ClientEmail;
-        var clientName = DemoUserDefaults.ClientName;
+            if (!await userManager.IsInRoleAsync(promoterUser, Roles.Promotor))
+                EnsureSucceeded(await userManager.AddToRoleAsync(promoterUser, Roles.Promotor),
+                    "asignar el rol Promotor al usuario demo");
 
-        var promoterProfile = await db.Promotores.SingleAsync(x => x.UserId == promoterUser.Id);
-        var client = await db.Clientes.SingleOrDefaultAsync(x => x.Email == clientEmail);
-        if (client is null)
-        {
-            client = new Cliente { Nombre = clientName, Email = clientEmail };
-            db.Clientes.Add(client);
-            await db.SaveChangesAsync();
-        }
-
-        if (!await db.ClientesPromotores.AnyAsync(x =>
-                x.ClienteId == client.Id && x.PromotorId == promoterProfile.Id))
-        {
-            db.ClientesPromotores.Add(new ClientePromotor
+            if (!await db.Promotores.AnyAsync(x => x.UserId == promoterUser.Id))
             {
-                ClienteId = client.Id,
-                PromotorId = promoterProfile.Id
-            });
-            await db.SaveChangesAsync();
-        }
+                db.Promotores.Add(new Promotor
+                {
+                    UserId = promoterUser.Id,
+                    Nombre = promoterName
+                });
+                await db.SaveChangesAsync();
+            }
 
-        if (demoDataEnabled)
+            var clientEmail = DemoUserDefaults.ClientEmail;
+            var clientName = DemoUserDefaults.ClientName;
+
+            var promoterProfile = await db.Promotores.SingleAsync(x => x.UserId == promoterUser.Id);
+            var client = await db.Clientes.SingleOrDefaultAsync(x => x.Email == clientEmail);
+            if (client is null)
+            {
+                client = new Cliente { Nombre = clientName, Email = clientEmail };
+                db.Clientes.Add(client);
+                await db.SaveChangesAsync();
+            }
+
+            if (!await db.ClientesPromotores.AnyAsync(x =>
+                    x.ClienteId == client.Id && x.PromotorId == promoterProfile.Id))
+            {
+                db.ClientesPromotores.Add(new ClientePromotor
+                {
+                    ClienteId = client.Id,
+                    PromotorId = promoterProfile.Id
+                });
+                await db.SaveChangesAsync();
+            }
+
+            if (demoDataEnabled)
+            {
+                await DemoDataSeeder.SeedAsync(
+                    db,
+                    promoterProfile,
+                    client,
+                    app.Environment.ContentRootPath);
+                logger.LogInformation("Se cargaron los datos de demostración.");
+            }
+        }
+        catch (Exception exception)
         {
-            await DemoDataSeeder.SeedAsync(
-                db,
-                promoterProfile,
-                client,
-                app.Environment.ContentRootPath);
-            logger.LogInformation("Se cargaron los datos de demostración.");
+            logger.LogError(exception,
+                "No fue posible completar la preparación de las cuentas demo. " +
+                "La aplicación continuará disponible para permitir el acceso y el diagnóstico.");
         }
     }
 

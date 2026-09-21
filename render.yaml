@@ -19,7 +19,7 @@ services:
       - key: DemoUsers__Enabled
         value: "true"
       - key: DemoData__Enabled
-        value: "true"
+        value: "false"
       - key: DemoAccess__ShowCredentials
         value: "true"
       - key: DemoUsers__PromoterEmail
