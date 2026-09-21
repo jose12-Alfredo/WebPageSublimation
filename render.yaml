@@ -17,11 +17,21 @@ services:
       - key: Deployment__DataProtectionKeysPath
         value: /keys
       - key: DemoUsers__Enabled
-        value: "false"
+        sync: false
       - key: DemoData__Enabled
-        value: "false"
+        sync: false
       - key: DemoAccess__ShowCredentials
-        value: "false"
+        sync: false
+      - key: DemoUsers__PromoterEmail
+        sync: false
+      - key: DemoUsers__PromoterPassword
+        sync: false
+      - key: DemoUsers__PromoterName
+        sync: false
+      - key: DemoUsers__ClientEmail
+        sync: false
+      - key: DemoUsers__ClientName
+        sync: false
       - key: ConnectionStrings__DefaultConnection
         sync: false
       - key: InitialAdmin__Email
